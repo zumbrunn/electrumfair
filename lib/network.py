@@ -314,9 +314,7 @@ class Network(util.DaemonThread):
         self.queue_request('server.banner', [])
         self.queue_request('server.donation_address', [])
         self.queue_request('server.peers.subscribe', [])
-        #self.queue_request('blockchain.getchainparameters', [])
-        #for i in bitcoin.FEE_TARGETS:
-        #    self.queue_request('blockchain.estimatefee', ['1']) # method not found in faircoind
+        self.queue_request('blockchain.estimatefee', [1])
         self.queue_request('blockchain.relayfee', [])
 
     def get_status_value(self, key):
@@ -325,7 +323,7 @@ class Network(util.DaemonThread):
         elif key == 'banner':
             value = self.banner
         elif key == 'fee':
-            value = self.config.fee_estimates
+            value = self.config.transaction_fee
         elif key == 'updated':
             value = (self.get_local_height(), self.get_server_height())
         elif key == 'servers':
@@ -514,15 +512,12 @@ class Network(util.DaemonThread):
         elif method == 'server.donation_address':
             if error is None:
                 self.donation_address = result
-        elif method == 'blockchain.estimatefee': # not working now but perhaps in future versions of electrumx
-                if error is None:
-                    i = params[0]
-                    self.config.fee_estimates[i] = int(result * COIN)
-                    self.notify('fee')
+        elif method == 'blockchain.estimatefee':
+            if error is None:
+                self.config.transaction_fee = int(result * COIN)
+                self.notify('fee')
         elif method == 'blockchain.relayfee':
             if error is None:
-                for i in bitcoin.FEE_TARGETS:
-                    self.config.fee_estimates[i] = int(result * COIN)
                 self.relay_fee = int(result * COIN)
                 self.print_error("relayfee", self.relay_fee)
                 self.notify('fee')
