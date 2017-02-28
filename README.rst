@@ -4,9 +4,10 @@ Electrum - Lightweight Bitcoin client
 ::
 
   Licence: MIT Licence
-  Author: Thomas Voegtlin
+  Author: Thomas König
+  Original Author: Thomas Voegtlin
   Language: Python
-  Homepage: https://electrum.org/
+  Homepage: https://electrum.fair-coin.org/
 
 
 .. image:: https://travis-ci.org/spesmilo/electrum.svg?branch=master
@@ -30,7 +31,7 @@ Electrum from its root directory, without installing it on your
 system; all the python dependencies are included in the 'packages'
 directory. To run Electrum from its root directory, just do::
 
-    ./electrum
+    ./electrumfair
 
 You can also install Electrum on your system, by running this command::
 
@@ -50,7 +51,7 @@ Development version
 
 Check out the code from Github::
 
-    git clone git://github.com/spesmilo/electrum.git
+    git clone git://github.com/faircoin/electrumfair.git
     cd electrum
 
 Run install (this should install dependencies)::
@@ -72,6 +73,24 @@ Create translations (optional)::
     sudo apt-get install python-pycurl gettext
     ./contrib/make_locale
 
+
+
+Install on Linux systems
+========================
+
+If you install Electrum on your system, you can run it from any
+directory.
+
+If you have pip, you can do::
+
+    python setup.py sdist
+    sudo pip install --pre dist/ElectrumFair-2.0.tar.gz
+
+
+If you don't have pip, install with::
+
+    python setup.py sdist
+    sudo python setup.py install
 
 
 
@@ -96,7 +115,7 @@ Mac OS X
     # On Homebrew installs: 
     ARCHFLAGS="-arch i386 -arch x86_64" sudo python setup-release.py py2app --includes sip
     
-    sudo hdiutil create -fs HFS+ -volname "Electrum" -srcfolder dist/Electrum.app dist/electrum-VERSION-macosx.dmg
+    sudo hdiutil create -fs HFS+ -volname "ElectrumFair" -srcfolder dist/ElectrumFair.app dist/electrumfair-VERSION-macosx.dmg
 
 Windows
 -------

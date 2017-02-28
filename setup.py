@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-
+# -*- coding: UTF8 -*-
 # python setup.py sdist --format=zip,gztar
 
 from setuptools import setup
@@ -12,7 +12,7 @@ import argparse
 version = imp.load_source('version', 'lib/version.py')
 
 if sys.version_info[:3] < (2, 7, 0):
-    sys.exit("Error: Electrum requires Python version >= 2.7.0...")
+    sys.exit("Error: ElectrumFair requires Python version >= 2.7.0...")
 
 data_files = []
 
@@ -28,13 +28,13 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
         else:
             usr_share = os.path.expanduser('~/.local/share')
     data_files += [
-        (os.path.join(usr_share, 'applications/'), ['electrum.desktop']),
-        (os.path.join(usr_share, 'pixmaps/'), ['icons/electrum.png'])
+        (os.path.join(usr_share, 'applications/'), ['electrumfair.desktop']),
+        (os.path.join(usr_share, 'pixmaps/'), ['icons/electrumfair.png'])
     ]
 
 setup(
-    name="Electrum",
-    version=version.ELECTRUM_VERSION,
+    name="ElectrumFair",
+    version=version.ELECTRUMFAIR_VERSION,
     install_requires=[
         'slowaes>=0.1a1',
         'ecdsa>=0.9',
@@ -63,9 +63,9 @@ setup(
         'electrum_plugins.virtualkeyboard',
     ],
     package_dir={
-        'electrum': 'lib',
-        'electrum_gui': 'gui',
-        'electrum_plugins': 'plugins',
+        'electrumfair': 'lib',
+        'electrumfair_gui': 'gui',
+        'electrumfair_plugins': 'plugins',
     },
     package_data={
         'electrum': [
@@ -75,12 +75,12 @@ setup(
             'locale/*/LC_MESSAGES/electrum.mo',
         ]
     },
-    scripts=['electrum'],
+    scripts=['electrumfair'],
     data_files=data_files,
-    description="Lightweight Bitcoin Wallet",
-    author="Thomas Voegtlin",
-    author_email="thomasv@electrum.org",
+    description="Lightweight FairCoin Wallet",
+    author="Thomas Voegtlin, Thomas König",
+    author_email="thomasv@electrum.org, tom@fair-coin.org",
     license="MIT Licence",
-    url="https://electrum.org",
-    long_description="""Lightweight Bitcoin Wallet"""
+    url="https://electrum.fair-coin.org",
+    long_description="""Lightweight FariCoin Wallet"""
 )

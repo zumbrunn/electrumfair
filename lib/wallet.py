@@ -83,7 +83,7 @@ class Abstract_Wallet(PrintError):
     max_change_outputs = 3
 
     def __init__(self, storage):
-        self.electrum_version = ELECTRUM_VERSION
+        self.electrum_version = ELECTRUMFAIR_VERSION
         self.storage = storage
         self.network = None
         # verifier (SPV) and synchronizer are started in start_threads
@@ -795,6 +795,7 @@ class Abstract_Wallet(PrintError):
         return 182 * 3 * self.relayfee() / 1000
 
     def get_tx_fee(self, tx):
+        # type: (object) -> object
         # this method can be overloaded
         return tx.get_fee()
 
@@ -1153,7 +1154,7 @@ class Abstract_Wallet(PrintError):
         if not r:
             return
         out = copy.copy(r)
-        out['URI'] = 'bitcoin:' + addr + '?amount=' + util.format_satoshis(out.get('amount'))
+        out['URI'] = 'faircoin:' + addr + '?amount=' + util.format_satoshis(out.get('amount'))
         status, conf = self.get_request_status(addr)
         out['status'] = status
         if conf is not None:

@@ -38,11 +38,12 @@ import aes
 
 # Bitcoin network constants
 TESTNET = False
-ADDRTYPE_P2PKH = 0
-ADDRTYPE_P2SH = 5
+ADDRTYPE_P2PKH = 95
+ADDRTYPE_P2SH = 36
 XPRV_HEADER = "0488ade4"
 XPUB_HEADER = "0488b21e"
-HEADERS_URL = "https://headers.electrum.org/blockchain_headers"
+HEADERS_URL = "" #https://headers.electrum.org/blockchain_headers"
+
 
 def set_testnet():
     global ADDRTYPE_P2PKH, ADDRTYPE_P2SH
@@ -57,9 +58,9 @@ def set_testnet():
 
 ################################## transactions
 
-FEE_STEP = 10000
-MAX_FEE_RATE = 100000
-FEE_TARGETS = [25, 10, 5, 2]
+FEE_STEP = 1000000
+MAX_FEE_RATE = 10000000
+FEE_TARGETS = [1]
 
 COINBASE_MATURITY = 100
 COIN = 100000000
@@ -68,6 +69,12 @@ COIN = 100000000
 TYPE_ADDRESS = 0
 TYPE_PUBKEY  = 1
 TYPE_SCRIPT  = 2
+
+#versions
+global PUBKEY_ADDRESS
+PUBKEY_ADDRESS = 95
+global SCRIPT_ADDRESS
+SCRIPT_ADDRESS = 36
 
 
 # AES encryption
@@ -450,7 +457,7 @@ from ecdsa.util import string_to_number, number_to_string
 def msg_magic(message):
     varint = var_int(len(message))
     encoded_varint = "".join([chr(int(varint[i:i+2], 16)) for i in xrange(0, len(varint), 2)])
-    return "\x18Bitcoin Signed Message:\n" + encoded_varint + message
+    return "\x18FairCoin Signed Message:\n" + encoded_varint + message
 
 
 def verify_message(address, sig, message):

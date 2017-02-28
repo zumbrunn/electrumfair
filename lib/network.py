@@ -40,27 +40,15 @@ import util
 import bitcoin
 from bitcoin import *
 from interface import Connection, Interface
-from blockchain import Blockchain
-from version import ELECTRUM_VERSION, PROTOCOL_VERSION
+from blockchain import Blockchain, CHUNK_SIZE
+from version import ELECTRUMFAIR_VERSION, PROTOCOL_VERSION
 
-DEFAULT_PORTS = {'t':'50001', 's':'50002'}
+DEFAULT_PORTS = {'t':'51811', 's':'51812'}
 
 DEFAULT_SERVERS = {
-    'erbium1.sytes.net':{'t':'50001', 's':'50002'},
-    'ecdsa.net':{'t':'50001', 's':'110'},
-    'gh05.geekhosters.com':{'t':'50001', 's':'50002'},
-    'VPS.hsmiths.com':{'t':'50001', 's':'50002'},
-    'electrum.anduck.net':{'t':'50001', 's':'50002'},
-    'electrum.no-ip.org':{'t':'50001', 's':'50002'},
-    'us.electrum.be':DEFAULT_PORTS,
-    'electrum.villocq.com':{'t':'50001', 's':'50002'},
-    'us10.einfachmalnettsein.de':{'t':'50001', 's':'50002'},
-    'electrum.trouth.net':{'t':'50001', 's':'50002'},
-    'Electrum.hsmiths.com':{'t':'8080', 's':'995'},
-    'electrum3.hachre.de':{'t':'50001', 's':'50002'},
-    'elec.luggs.co':{'t':'80', 's':'443'},
-    'btc.smsys.me':{'t':'110', 's':'995'},
-    'btc.mustyoshi.com':{'t':'50001', 's':'50002'},
+    'electrumfair.punto0.org':{'t':'51811','s':'51812'},
+    'fairlectrum.fair-coin.net':{'s':'51812'},
+    'fairlectrum.fair.to':{'s':'51812'},
 }
 
 def set_testnet():
@@ -299,6 +287,8 @@ class Network(util.DaemonThread):
         return self.unanswered_requests == {}
 
     def queue_request(self, method, params, interface=None):
+        # type: (object, object, object) -> object
+        # type: (object, object, object) -> object
         # If you want to queue a request on any interface it must go
         # through this function so message ids are properly tracked
         if interface is None:
@@ -324,8 +314,9 @@ class Network(util.DaemonThread):
         self.queue_request('server.banner', [])
         self.queue_request('server.donation_address', [])
         self.queue_request('server.peers.subscribe', [])
-        for i in bitcoin.FEE_TARGETS:
-            self.queue_request('blockchain.estimatefee', [i])
+        #self.queue_request('blockchain.getchainparameters', [])
+        #for i in bitcoin.FEE_TARGETS:
+        #    self.queue_request('blockchain.estimatefee', ['1']) # method not found in faircoind
         self.queue_request('blockchain.relayfee', [])
 
     def get_status_value(self, key):
@@ -523,15 +514,18 @@ class Network(util.DaemonThread):
         elif method == 'server.donation_address':
             if error is None:
                 self.donation_address = result
-        elif method == 'blockchain.estimatefee':
-            if error is None:
-                i = params[0]
-                self.config.fee_estimates[i] = int(result * COIN)
-                self.notify('fee')
+        elif method == 'blockchain.estimatefee': # not working now but perhaps in future versions of electrumx
+                if error is None:
+                    i = params[0]
+                    self.config.fee_estimates[i] = int(result * COIN)
+                    self.notify('fee')
         elif method == 'blockchain.relayfee':
             if error is None:
+                for i in bitcoin.FEE_TARGETS:
+                    self.config.fee_estimates[i] = int(result * COIN)
                 self.relay_fee = int(result * COIN)
                 self.print_error("relayfee", self.relay_fee)
+                self.notify('fee')
         elif method == 'blockchain.block.get_chunk':
             self.on_get_chunk(interface, response)
         elif method == 'blockchain.block.get_header':
@@ -667,7 +661,7 @@ class Network(util.DaemonThread):
             if interface.has_timed_out():
                 self.connection_down(interface.server)
             elif interface.ping_required():
-                params = [ELECTRUM_VERSION, PROTOCOL_VERSION]
+                params = [ELECTRUMFAIR_VERSION, PROTOCOL_VERSION]
                 self.queue_request('server.version', params, interface)
 
         now = time.time()
@@ -753,7 +747,7 @@ class Network(util.DaemonThread):
         if if_height <= local_height:
             return False
         elif if_height > local_height + 50:
-            self.request_chunk(interface, data, (local_height + 1) / 2016)
+            self.request_chunk(interface, data, (local_height + 1) / CHUNK_SIZE)
         else:
             self.request_header(interface, data, if_height)
         return True
