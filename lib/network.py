@@ -46,17 +46,14 @@ from version import ELECTRUMFAIR_VERSION, PROTOCOL_VERSION
 DEFAULT_PORTS = {'t':'51811', 's':'51812'}
 
 DEFAULT_SERVERS = {
+    'electrum.faircoin.world':{'s':'51812'},
     'electrumfair.punto0.org':{'t':'51811','s':'51812'},
-    'fairlectrum.fair-coin.net':{'s':'51812'},
-    'fairlectrum.fair.to':{'s':'51812'},
 }
 
 def set_testnet():
     global DEFAULT_PORTS, DEFAULT_SERVERS
-    DEFAULT_PORTS = {'t':'51001', 's':'51002'}
+    DEFAULT_PORTS = {'t':'52811', 's':'52812'}
     DEFAULT_SERVERS = {
-        '14.3.140.101': DEFAULT_PORTS,
-        'testnet.not.fyi': DEFAULT_PORTS
     }
 
 NODES_RETRY_INTERVAL = 60

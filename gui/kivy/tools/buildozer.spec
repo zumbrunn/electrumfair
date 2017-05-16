@@ -38,8 +38,8 @@ requirements = hostpython2, android, openssl, pycrypto, pil, plyer, kivy==master
 presplash.filename = %(source.dir)s/icons/electrumfair.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/icons/electrumfair_android_launcher_icon.png
-icon.filename = %(source.dir)s/icons/electrumfair_launcher.png
+icon.filename = %(source.dir)s/icons/electrumfair_android_launcher_icon.png
+#icon.filename = %(source.dir)s/icons/electrumfair_launcher.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
 orientation = portrait
@@ -101,7 +101,7 @@ android.private_storage = True
 #android.ouya.icon.filename = %(source.dir)s/data/ouya_icon.png
 
 # (str) XML file to include as an intent filters in <activity> tag
-android.manifest.intent_filters = gui/kivy/tools/bitcoin_intent.xml
+android.manifest.intent_filters = gui/kivy/tools/faircoin_intent.xml
 
 # (list) Android additionnal libraries to copy into libs/armeabi
 #android.add_libs_armeabi = lib/android/*.so
