@@ -24,7 +24,7 @@ source.exclude_dirs = bin, build, dist, contrib, gui/qt, gui/kivy/tools, gui/kiv
 source.exclude_patterns = Makefile,setup*
 
 # (str) Application versioning (method 1)
-version.regex = version_apk = '(.*)'
+version.regex = ELECTRUMFAIR_VERSION = '(.*)'
 version.filename = %(source.dir)s/lib/version.py
 
 # (str) Application versioning (method 2)
@@ -117,10 +117,10 @@ android.manifest.intent_filters = gui/kivy/tools/faircoin_intent.xml
 # project.properties automatically.)
 #android.library_references =
 
-android.p4a_whitelist = lib-dynload/_csv.so
+android.whitelist = lib-dynload/_csv.so
 
 # local version that merges branch 866
-android.p4a_dir = /opt/python-for-android
+p4a.source_dir = /usr/local/lib/python2.7/dist-packages/pythonforandroid
 
 #
 # iOS specific

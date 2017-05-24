@@ -161,7 +161,7 @@ class Daemon(DaemonThread):
                     'spv_nodes': len(self.network.get_interfaces()),
                     'connected': self.network.is_connected(),
                     'auto_connect': p[4],
-                    'version': ELECTRUM_VERSION,
+                    'version': ELECTRUMFAIR_VERSION,
                     'wallets': {k: w.is_up_to_date()
                                 for k, w in self.wallets.items()},
                 }
