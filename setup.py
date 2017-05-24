@@ -72,7 +72,7 @@ setup(
             'currencies.json',
             'www/index.html',
             'wordlist/*.txt',
-            'locale/*/LC_MESSAGES/electrum.mo',
+            'locale/*/LC_MESSAGES/electrum-fair.mo',
         ]
     },
     scripts=['electrumfair'],
