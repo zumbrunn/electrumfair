@@ -42,7 +42,7 @@ ADDRTYPE_P2PKH = 95
 ADDRTYPE_P2SH = 36
 XPRV_HEADER = "0488ade4"
 XPUB_HEADER = "0488b21e"
-HEADERS_URL = "" #https://headers.electrum.org/blockchain_headers"
+HEADERS_URL = "https://headers.faircoin.world/electrum_blockchain_headers"
 
 
 def set_testnet():
@@ -61,7 +61,7 @@ def set_testnet():
 FEE_STEP = 1000000
 MAX_FEE_RATE = 10000000
 
-COINBASE_MATURITY = 100
+COINBASE_MATURITY = 10
 COIN = 100000000
 
 # supported types of transction outputs
