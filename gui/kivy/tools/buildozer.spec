@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = Electrum
+title = ElectrumFair
 
 # (str) Package name
-package.name = Electrum
+package.name = ElectrumFair
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.electrum
+package.domain = org.electrumfair
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -24,8 +24,8 @@ source.exclude_dirs = bin, build, dist, contrib, gui/qt, gui/kivy/tools, gui/kiv
 source.exclude_patterns = Makefile,setup*
 
 # (str) Application versioning (method 1)
-version.regex = version_apk = '(.*)'
-version.filename = %(source.dir)s/contrib/versions.py
+version.regex = ELECTRUMFAIR_VERSION = '(.*)'
+version.filename = %(source.dir)s/lib/version.py
 
 # (str) Application versioning (method 2)
 #version = 1.9.8
@@ -35,11 +35,11 @@ requirements = hostpython2, android, openssl, pycrypto, pil, plyer, kivy==master
 
 # (str) Presplash of the application
 #presplash.filename = %(source.dir)s/gui/kivy/theming/splash.png
-presplash.filename = %(source.dir)s/icons/electrum.png
+presplash.filename = %(source.dir)s/icons/electrumfair_android_splash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/icons/electrum_android_launcher_icon.png
-icon.filename = %(source.dir)s/icons/electrum_launcher.png
+icon.filename = %(source.dir)s/icons/electrumfair_android_launcher_icon.png
+#icon.filename = %(source.dir)s/icons/electrumfair_launcher.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
 orientation = portrait
@@ -101,7 +101,7 @@ android.private_storage = True
 #android.ouya.icon.filename = %(source.dir)s/data/ouya_icon.png
 
 # (str) XML file to include as an intent filters in <activity> tag
-android.manifest.intent_filters = gui/kivy/tools/bitcoin_intent.xml
+android.manifest.intent_filters = gui/kivy/tools/faircoin_intent.xml
 
 # (list) Android additionnal libraries to copy into libs/armeabi
 #android.add_libs_armeabi = lib/android/*.so
@@ -117,10 +117,10 @@ android.manifest.intent_filters = gui/kivy/tools/bitcoin_intent.xml
 # project.properties automatically.)
 #android.library_references =
 
-android.p4a_whitelist = lib-dynload/_csv.so
+android.whitelist = lib-dynload/_csv.so
 
 # local version that merges branch 866
-android.p4a_dir = /opt/python-for-android
+p4a.source_dir = /usr/local/lib/python2.7/dist-packages/pythonforandroid
 
 #
 # iOS specific

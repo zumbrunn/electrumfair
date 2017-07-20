@@ -31,7 +31,7 @@ import time
 import jsonrpclib
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer, SimpleJSONRPCRequestHandler
 
-from version import ELECTRUM_VERSION
+from version import ELECTRUMFAIR_VERSION
 from network import Network
 from util import json_decode, DaemonThread
 from util import print_msg, print_error, print_stderr, UserCancelled
@@ -173,7 +173,7 @@ class Daemon(DaemonThread):
                     'spv_nodes': len(self.network.get_interfaces()),
                     'connected': self.network.is_connected(),
                     'auto_connect': p[4],
-                    'version': ELECTRUM_VERSION,
+                    'version': ELECTRUMFAIR_VERSION,
                     'wallets': {k: w.is_up_to_date()
                                 for k, w in self.wallets.items()},
                     'fee_per_kb': self.config.fee_per_kb(),
@@ -278,6 +278,6 @@ class Daemon(DaemonThread):
         gui_name = config.get('gui', 'qt')
         if gui_name in ['lite', 'classic']:
             gui_name = 'qt'
-        gui = __import__('electrum_gui.' + gui_name, fromlist=['electrum_gui'])
+        gui = __import__('electrumfair_gui.' + gui_name, fromlist=['electrumfair_gui'])
         self.gui = gui.ElectrumGui(config, self, plugins)
         self.gui.main()
