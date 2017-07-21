@@ -42,7 +42,7 @@ class SimpleConfig(PrintError):
         # a thread-safe way.
         self.lock = threading.RLock()
 
-        self.transaction_fee = 0.1 # let's have a reasonable start value
+        self.transaction_fee = 1000000 # let's have a reasonable start value
 
         # The following two functions are there for dependency injection when
         # testing.
