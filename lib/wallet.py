@@ -90,7 +90,7 @@ class Abstract_Wallet(PrintError):
         self.synchronizer = None
         self.verifier = None
 
-        self.gap_limit_for_change  = storage.get('gap_limit_for_change', 6)
+        self.gap_limit_for_change  = storage.get('gap_limit_for_change', 20)
         # saved fields
         self.use_change            = storage.get('use_change', True)
         self.multiple_change       = storage.get('multiple_change', False)
