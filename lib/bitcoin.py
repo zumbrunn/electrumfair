@@ -44,7 +44,7 @@ ADDRTYPE_P2SH = 36
 ADDRTYPE_P2WPKH = 6
 XPRV_HEADER = 0x0488ade4
 XPUB_HEADER = 0x0488b21e
-HEADERS_URL = "https://headers.faircoin.world/electrum_blockchain_headers"
+HEADERS_URL = "https://download.faircoin.world/electrum/blockchain_headers"
 
 def set_testnet():
     global ADDRTYPE_P2PKH, ADDRTYPE_P2SH, ADDRTYPE_P2WPKH
