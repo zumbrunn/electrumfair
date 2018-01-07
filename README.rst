@@ -7,7 +7,7 @@ Electrum - Lightweight FairCoin client
   Author: Thomas König
   Original Author: Thomas Voegtlin
   Language: Python
-  Homepage: https://electrum.fair-coin.org/
+  Homepage: https://download.faircoin.world/
 
 
 .. image:: https://travis-ci.org/spesmilo/electrum.svg?branch=master

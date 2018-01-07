@@ -82,6 +82,6 @@ setup(
     author="Thomas Voegtlin, Thomas König",
     author_email="thomasv@electrum.org, tom@fair-coin.org",
     license="MIT Licence",
-    url="https://electrum.fair-coin.org",
+    url="https://download.faircoin.world",
     long_description="""Lightweight FairCoin Wallet"""
 )
