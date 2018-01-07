@@ -1,3 +1,11 @@
+# Release 2.8.4 : (Security update)
+
+ * Fix a vulnerability caused by Cross-Origin Resource Sharing (CORS)
+   in the JSONRPC interface. Previous versions of Electrum are
+   vulnerable to port scanning and deanonimization attacks from
+   malicious websites. Wallets that are not password-protected are
+   vulnerable to theft.
+
 # Release 2.8.3
   * Blockchain checkpoints can be added and configured from the GUI.
   * Fix crash on reading older wallet formats.
