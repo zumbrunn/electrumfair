@@ -33,6 +33,7 @@ import traceback
 import urlparse
 import urllib
 import threading
+import hmac
 from i18n import _
 
 base_units = {'FAIR':8, 'mFAIR':5, 'uFAIR':2}
@@ -191,6 +192,21 @@ def json_decode(x):
     except:
         return x
 
+def to_string(x, enc):
+    if isinstance(x, (bytes, bytearray)):
+        return x.decode(enc)
+    if isinstance(x, str):
+        return x
+    else:
+        raise TypeError("Not a string or bytes like object")
+
+
+# taken from Django Source Code
+def constant_time_compare(val1, val2):
+    """Return True if the two strings are equal, False otherwise."""
+    return hmac.compare_digest(val1, val2)
+
+
 # decorator that prints execution time
 def profiler(func):
     def do_profile(func, args, kw_args):
@@ -250,7 +266,7 @@ def user_dir():
     elif "APPDATA" in os.environ:
         return os.path.join(os.environ["APPDATA"], "ElectrumFair")
     elif "LOCALAPPDATA" in os.environ:
-        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum")
+        return os.path.join(os.environ["LOCALAPPDATA"], "ElectrumFair")
     else:
         #raise Exception("No home directory found in environment variables.")
         return
