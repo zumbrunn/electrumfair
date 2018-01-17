@@ -41,6 +41,7 @@ from .bitcoin import *
 from .interface import Connection, Interface
 from . import blockchain
 from .version import ELECTRUM_VERSION, PROTOCOL_VERSION
+from blockchain import CHUNK_SIZE
 
 
 NODES_RETRY_INTERVAL = 60
@@ -288,6 +289,8 @@ class Network(util.DaemonThread):
         return self.unanswered_requests == {}
 
     def queue_request(self, method, params, interface=None):
+        # type: (object, object, object) -> object
+        # type: (object, object, object) -> object
         # If you want to queue a request on any interface it must go
         # through this function so message ids are properly tracked
         if interface is None:
@@ -314,15 +317,14 @@ class Network(util.DaemonThread):
         self.request_fee_estimates()
         self.queue_request('blockchain.relayfee', [])
         if self.interface.ping_required():
-            params = [ELECTRUM_VERSION, PROTOCOL_VERSION]
+            params = [ELECTRUMFAIR_VERSION, PROTOCOL_VERSION]
             self.queue_request('server.version', params, self.interface)
         for h in self.subscribed_addresses:
             self.queue_request('blockchain.scripthash.subscribe', [h])
 
     def request_fee_estimates(self):
         self.config.requested_fee_estimates()
-        for i in bitcoin.FEE_TARGETS:
-            self.queue_request('blockchain.estimatefee', [i])
+        self.queue_request('blockchain.estimatefee', [1])
 
     def get_status_value(self, key):
         if key == 'status':
@@ -330,7 +332,7 @@ class Network(util.DaemonThread):
         elif key == 'banner':
             value = self.banner
         elif key == 'fee':
-            value = self.config.fee_estimates
+            value = self.config.transaction_fee
         elif key == 'updated':
             value = (self.get_local_height(), self.get_server_height())
         elif key == 'servers':
@@ -543,16 +545,14 @@ class Network(util.DaemonThread):
             if error is None:
                 self.donation_address = result
         elif method == 'blockchain.estimatefee':
-            if error is None and result > 0:
-                i = params[0]
-                fee = int(result*COIN)
-                self.config.update_fee_estimates(i, fee)
-                self.print_error("fee_estimates[%d]" % i, fee)
+            if error is None:
+                self.config.transaction_fee = int(result * COIN)
                 self.notify('fee')
         elif method == 'blockchain.relayfee':
             if error is None:
                 self.relay_fee = int(result * COIN)
                 self.print_error("relayfee", self.relay_fee)
+                self.notify('fee')
         elif method == 'blockchain.block.get_chunk':
             self.on_get_chunk(interface, response)
         elif method == 'blockchain.block.get_header':
@@ -727,7 +727,7 @@ class Network(util.DaemonThread):
             if interface.has_timed_out():
                 self.connection_down(interface.server)
             elif interface.ping_required():
-                params = [ELECTRUM_VERSION, PROTOCOL_VERSION]
+                params = [ELECTRUMFAIR_VERSION, PROTOCOL_VERSION]
                 self.queue_request('server.version', params, interface)
 
         now = time.time()
@@ -901,7 +901,7 @@ class Network(util.DaemonThread):
         # If not finished, get the next header
         if next_height:
             if interface.mode == 'catch_up' and interface.tip > next_height + 50:
-                self.request_chunk(interface, next_height // 2016)
+                self.request_chunk(interface, next_height // CHUNK_SIZE)
             else:
                 self.request_header(interface, next_height)
         else:

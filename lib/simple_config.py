@@ -7,9 +7,9 @@ import stat
 from copy import deepcopy
 from .util import user_dir, print_error, print_stderr, PrintError
 
-from .bitcoin import MAX_FEE_RATE, FEE_TARGETS
+from .bitcoin import MAX_FEE_RATE
 
-SYSTEM_CONFIG_PATH = "/etc/electrum.conf"
+SYSTEM_CONFIG_PATH = "/etc/electrumfair.conf"
 
 config = None
 
@@ -48,6 +48,7 @@ class SimpleConfig(PrintError):
         self.fee_estimates = {}
         self.fee_estimates_last_updated = {}
         self.last_time_fee_estimates_requested = 0  # zero ensures immediate fees
+        self.transaction_fee = 1000000 # let's have a reasonable start value
 
         # The following two functions are there for dependency injection when
         # testing.
@@ -207,26 +208,10 @@ class SimpleConfig(PrintError):
         return f
 
     def dynfee(self, i):
-        if i < 4:
-            j = FEE_TARGETS[i]
-            fee = self.fee_estimates.get(j)
-        else:
-            assert i == 4
-            fee = self.fee_estimates.get(2)
-            if fee is not None:
-                fee += fee/2
-        if fee is not None:
-            fee = min(5*MAX_FEE_RATE, fee)
-        return fee
+        return self.transaction_fee
 
     def reverse_dynfee(self, fee_per_kb):
-        import operator
-        l = list(self.fee_estimates.items()) + [(1, self.dynfee(4))]
-        dist = map(lambda x: (x[0], abs(x[1] - fee_per_kb)), l)
-        min_target, min_value = min(dist, key=operator.itemgetter(1))
-        if fee_per_kb < self.fee_estimates.get(25)/2:
-            min_target = -1
-        return min_target
+        return self.transaction_fee
 
     def static_fee(self, i):
         return self.fee_rates[i]
@@ -236,18 +221,13 @@ class SimpleConfig(PrintError):
         return min(range(len(dist)), key=dist.__getitem__)
 
     def has_fee_estimates(self):
-        return len(self.fee_estimates)==4
+        return True
 
     def is_dynfee(self):
-        return self.get('dynamic_fees', True)
+        return False
 
     def fee_per_kb(self):
-        dyn = self.is_dynfee()
-        if dyn:
-            fee_rate = self.dynfee(self.get('fee_level', 2))
-        else:
-            fee_rate = self.get('fee_per_kb', self.max_fee_rate()/2)
-        return fee_rate
+        return self.transaction_fee
 
     def estimate_fee(self, size):
         return int(self.fee_per_kb() * size / 1000.)
@@ -278,7 +258,7 @@ class SimpleConfig(PrintError):
 
 
 def read_system_config(path=SYSTEM_CONFIG_PATH):
-    """Parse and return the system config settings in /etc/electrum.conf."""
+    """Parse and return the system config settings in /etc/electrumfair.conf."""
     result = {}
     if os.path.exists(path):
         import configparser
@@ -293,7 +273,7 @@ def read_system_config(path=SYSTEM_CONFIG_PATH):
     return result
 
 def read_user_config(path):
-    """Parse and store the user config settings in electrum.conf into user_config[]."""
+    """Parse and store the user config settings in electrumfair.conf into user_config[]."""
     if not path:
         return {}
     config_path = os.path.join(path, "config")

@@ -10,6 +10,7 @@ import threading
 class FeeSlider(QSlider):
 
     def __init__(self, window, config, callback):
+        # type: (object, object, object) -> object
         QSlider.__init__(self, Qt.Horizontal)
         self.config = config
         self.window = window
@@ -18,6 +19,8 @@ class FeeSlider(QSlider):
         self.lock = threading.RLock()
         self.update()
         self.valueChanged.connect(self.moved)
+        self.setRange(1, 10)
+        self.setValue(10)
 
     def moved(self, pos):
         with self.lock:
@@ -43,14 +46,14 @@ class FeeSlider(QSlider):
         with self.lock:
             self.dyn = self.config.is_dynfee()
             if self.dyn:
-                pos = self.config.get('fee_level', 2)
+                pos = 10 #self.config.get('fee_level', 2)
                 fee_rate = self.config.dynfee(pos)
-                self.setRange(0, 4)
+                self.setRange(0, 10)
                 self.setValue(pos)
             else:
                 fee_rate = self.config.fee_per_kb()
-                pos = self.config.static_fee_index(fee_rate)
-                self.setRange(0, 9)
+                pos = 10 #self.config.static_fee_index(fee_rate)
+                self.setRange(0, 10)
                 self.setValue(pos)
             tooltip = self.get_tooltip(pos, fee_rate)
             self.setToolTip(tooltip)

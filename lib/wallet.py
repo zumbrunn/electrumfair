@@ -69,8 +69,8 @@ TX_STATUS = [
 
 
 def relayfee(network):
-    RELAY_FEE = 5000
-    MAX_RELAY_FEE = 50000
+    RELAY_FEE = 1000000
+    MAX_RELAY_FEE = 20000000
     f = network.relay_fee if network and network.relay_fee else RELAY_FEE
     return min(f, MAX_RELAY_FEE)
 
@@ -156,14 +156,14 @@ class Abstract_Wallet(PrintError):
     max_change_outputs = 3
 
     def __init__(self, storage):
-        self.electrum_version = ELECTRUM_VERSION
+        self.electrum_version = ELECTRUMFAIR_VERSION
         self.storage = storage
         self.network = None
         # verifier (SPV) and synchronizer are started in start_threads
         self.synchronizer = None
         self.verifier = None
 
-        self.gap_limit_for_change = 6 # constant
+        self.gap_limit_for_change  = storage.get('gap_limit_for_change', 20)
         # saved fields
         self.use_change            = storage.get('use_change', True)
         self.multiple_change       = storage.get('multiple_change', False)
@@ -868,7 +868,7 @@ class Abstract_Wallet(PrintError):
             _type, data, value = o
             if _type == TYPE_ADDRESS:
                 if not is_address(data):
-                    raise BaseException("Invalid bitcoin address:" + data)
+                    raise BaseException("Invalid FairCoin address:" + data)
             if value == '!':
                 if i_max is not None:
                     raise BaseException("More than one output set to spend max")
@@ -1205,7 +1205,7 @@ class Abstract_Wallet(PrintError):
         if not r:
             return
         out = copy.copy(r)
-        out['URI'] = 'bitcoin:' + addr + '?amount=' + format_satoshis(out.get('amount'))
+        out['URI'] = 'faircoin:' + addr + '?amount=' + format_satoshis(out.get('amount'))
         status, conf = self.get_request_status(addr)
         out['status'] = status
         if conf is not None:

@@ -55,7 +55,7 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.label import Label
 from kivy.core.clipboard import Clipboard
 
-Factory.register('TabbedCarousel', module='electrum_gui.kivy.uix.screens')
+Factory.register('TabbedCarousel', module='electrumfair_gui.kivy.uix.screens')
 
 # Register fonts without this you won't be able to use bold/italic...
 # inside markup.
@@ -132,7 +132,7 @@ class ElectrumWindow(App):
         self.send_screen.set_URI(uri)
 
     def on_new_intent(self, intent):
-        if intent.getScheme() != 'bitcoin':
+        if intent.getScheme() != 'faircoin':
             return
         uri = intent.getDataString()
         self.set_URI(uri)
@@ -154,7 +154,7 @@ class ElectrumWindow(App):
         self._trigger_update_history()
 
     def _get_bu(self):
-        return self.electrum_config.get('base_unit', 'mBTC')
+        return self.electrum_config.get('base_unit', 'FAIR')
 
     def _set_bu(self, value):
         assert value in base_units.keys()
@@ -300,7 +300,7 @@ class ElectrumWindow(App):
         if is_address(data):
             self.set_URI(data)
             return
-        if data.startswith('bitcoin:'):
+        if data.startswith('faircoin:'):
             self.set_URI(data)
             return
         # try to decode transaction
@@ -445,7 +445,7 @@ class ElectrumWindow(App):
         self.fiat_unit = self.fx.ccy if self.fx.is_enabled() else ''
         # default tab
         self.switch_to('history')
-        # bind intent for bitcoin: URI scheme
+        # bind intent for faircoin: URI scheme
         if platform == 'android':
             from android import activity
             from jnius import autoclass
@@ -488,7 +488,8 @@ class ElectrumWindow(App):
                 self.load_wallet(wallet)
                 self.on_resume()
         else:
-            Logger.debug('Electrum: Wallet not found. Launching install wizard')
+
+            Logger.debug('ElectrumFair: Wallet not found. Launching install wizard')
             storage = WalletStorage(path)
             wizard = Factory.InstallWizard(self.electrum_config, storage)
             wizard.bind(on_wizard_complete=self.on_wizard_complete)
@@ -563,9 +564,9 @@ class ElectrumWindow(App):
 
         #setup lazy imports for mainscreen
         Factory.register('AnimatedPopup',
-                         module='electrum_gui.kivy.uix.dialogs')
+                         module='electrumfair_gui.kivy.uix.dialogs')
         Factory.register('QRCodeWidget',
-                         module='electrum_gui.kivy.uix.qrcodewidget')
+                         module='electrumfair_gui.kivy.uix.qrcodewidget')
 
         # preload widgets. Remove this if you want to load the widgets on demand
         #Cache.append('electrum_widgets', 'AnimatedPopup', Factory.AnimatedPopup())
@@ -581,7 +582,7 @@ class ElectrumWindow(App):
         self.receive_screen = None
         self.requests_screen = None
         self.address_screen = None
-        self.icon = "icons/electrum.png"
+        self.icon = "icons/electrumfair.png"
         self.tabs = self.root.ids['tabs']
 
     def update_interfaces(self, dt):
@@ -670,8 +671,8 @@ class ElectrumWindow(App):
                 from plyer import notification
             icon = (os.path.dirname(os.path.realpath(__file__))
                     + '/../../' + self.icon)
-            notification.notify('Electrum', message,
-                            app_icon=icon, app_name='Electrum')
+            notification.notify('ElectrumFair', message,
+                            app_icon=icon, app_name='ElectrumFair')
         except ImportError:
             Logger.Error('Notification: needs plyer; `sudo pip install plyer`')
 

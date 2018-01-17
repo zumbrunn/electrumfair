@@ -22,6 +22,14 @@ except ImportError:
 
 class Test_bitcoin(unittest.TestCase):
 
+    def test_signature_verfication(self):
+        point = ser_to_point("04ec775cffb203bf47ef358edf66231e5e4e6f247bdaa93ed789b5d3c7b8f384a93af927b62630afe039d4b159c339766207e7f47fbe92ee4bf21a893fdaf87eae".decode('hex'))
+        pubKey = ecdsa.VerifyingKey.from_public_point(point, ecdsa.SECP256k1)
+
+        sig = "304402206b9caba68425b04d6df0e74f520ba2b08b94fcb9064e02f4cf23c1597c9b71ee022042fca1e85dcfa79aa67f62de6361bd73449d159a9535aaaf00dc53e64d01f588".decode('hex')
+        blockHash = rev_hex("12878a98fcc0670c229252f59c1b2daac768b159911aba8f9e4f498c2a8b13d8").decode('hex')
+        pubKey.verify_digest(sig, blockHash, ecdsa.util.sigdecode_der)
+
     def test_crypto(self):
         for message in [b"Chancellor on brink of second bailout for banks", b'\xff'*512]:
             self._do_test_crypto(message)
@@ -270,47 +278,14 @@ class Test_xprv_xpub(unittest.TestCase):
 class Test_keyImport(unittest.TestCase):
 
     priv_pub_addr = (
-           {'priv': 'KzMFjMC2MPadjvX5Cd7b8AKKjjpBSoRKUTpoAtN6B3J9ezWYyXS6',
-            'pub': '02c6467b7e621144105ed3e4835b0b4ab7e35266a2ae1c4f8baa19e9ca93452997',
-            'address': '17azqT8T16coRmWKYFj3UjzJuxiYrYFRBR',
+           {'priv': 'a87SJfG4zML2R7SVyAjfQvPpukx2D5UPWPBPgk5cwBH3jfdyvyyM',
+            'pub': '0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2',
+            'address': 'fJscruM2G12wCkM83jGg1r4voVYudncrfC',
             'minikey' : False,
             'txin_type': 'p2pkh',
             'compressed': True,
             'addr_encoding': 'base58',
             'scripthash': 'c9aecd1fef8d661a42c560bf75c8163e337099800b8face5ca3d1393a30508a7'},
-           {'priv': '5Hxn5C4SQuiV6e62A1MtZmbSeQyrLFhu5uYks62pU5VBUygK2KD',
-            'pub': '04e5fe91a20fac945845a5518450d23405ff3e3e1ce39827b47ee6d5db020a9075422d56a59195ada0035e4a52a238849f68e7a325ba5b2247013e0481c5c7cb3f',
-            'address': '1GPHVTY8UD9my6jyP4tb2TYJwUbDetyNC6',
-            'minikey': False,
-            'txin_type': 'p2pkh',
-            'compressed': False,
-            'addr_encoding': 'base58',
-            'scripthash': 'f5914651408417e1166f725a5829ff9576d0dbf05237055bf13abd2af7f79473'},
-           {'priv': 'LHJnnvRzsdrTX2j5QeWVsaBkabK7gfMNqNNqxnbBVRaJYfk24iJz',
-            'pub': '0279ad237ca0d812fb503ab86f25e15ebd5fa5dd95c193639a8a738dcd1acbad81',
-            'address': '3GeVJB3oKr7psgKR6BTXSxKtWUkfsHHhk7',
-            'minikey': False,
-            'txin_type': 'p2wpkh-p2sh',
-            'compressed': True,
-            'addr_encoding': 'base58',
-            'scripthash': 'd7b04e882fa6b13246829ac552a2b21461d9152eb00f0a6adb58457a3e63d7c5'},
-           {'priv': 'L8g5V8kFFeg2WbecahRSdobARbHz2w2STH9S8ePHVSY4fmia7Rsj',
-            'pub': '03e9f948421aaa89415dc5f281a61b60dde12aae3181b3a76cd2d849b164fc6d0b',
-            'address': 'bc1qqmpt7u5e9hfznljta5gnvhyvfd2kdd0r90hwue',
-            'minikey': False,
-            'txin_type': 'p2wpkh',
-            'compressed': True,
-            'addr_encoding': 'bech32',
-            'scripthash': '1929acaaef3a208c715228e9f1ca0318e3a6b9394ab53c8d026137f847ecf97b'},
-           # from http://bitscan.com/articles/security/spotlight-on-mini-private-keys
-           {'priv': 'SzavMBLoXU6kDrqtUVmffv',
-            'pub': '02588d202afcc1ee4ab5254c7847ec25b9a135bbda0f2bc69ee1a714749fd77dc9',
-            'address': '19GuvDvMMUZ8vq84wT79fvnvhMd5MnfTkR',
-            'minikey': True,
-            'txin_type': 'p2pkh',
-            'compressed': True,  # this is actually ambiguous... issue #2748
-            'addr_encoding': 'base58',
-            'scripthash': '60ad5a8b922f758cd7884403e90ee7e6f093f8d21a0ff24c9a865e695ccefdf1'},
     )
 
     def test_public_key_from_private_key(self):

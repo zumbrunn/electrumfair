@@ -57,6 +57,9 @@ for name in zfobj.namelist():
         with open(name[16:], 'wb') as output:
             output.write(zfobj.read(name))
 
+# Replace Bitcoin with FairCoin
+os.system("find locale -type f -name '*.po' -exec sed -i 's/bitcoin/FairCoin/gI' {} +")
+
 # Convert .po to .mo
 print('Installing')
 for lang in os.listdir('locale'):
@@ -66,6 +69,6 @@ for lang in os.listdir('locale'):
     mo_dir = 'locale/%s/LC_MESSAGES' % lang
     if not os.path.exists(mo_dir):
         os.mkdir(mo_dir)
-    cmd = 'msgfmt --output-file="%s/electrum.mo" "locale/%s/electrum.po"' % (mo_dir,lang)
+    cmd = 'msgfmt --output-file="%s/electrumfair.mo" "locale/%s/electrum.po"' % (mo_dir,lang)
     print('Installing', lang)
     os.system(cmd)
