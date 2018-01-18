@@ -40,8 +40,8 @@ from . import bitcoin
 from .bitcoin import *
 from .interface import Connection, Interface
 from . import blockchain
-from .version import ELECTRUM_VERSION, PROTOCOL_VERSION
-from blockchain import CHUNK_SIZE
+from .version import ELECTRUMFAIR_VERSION, PROTOCOL_VERSION
+from .blockchain import CHUNK_SIZE
 
 
 NODES_RETRY_INTERVAL = 60
