@@ -143,7 +143,7 @@ class Blockchain(util.PrintError):
 
     def update_size(self):
         p = self.path()
-        self._size = os.path.getsize(p)//80 if os.path.exists(p) else 0
+        self._size = os.path.getsize(p)//HEADER_SIZE if os.path.exists(p) else 0
 
     def verify_header(self, header, prev_header):
         prev_hash = hash_header(prev_header)
