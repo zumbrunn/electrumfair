@@ -80,7 +80,7 @@ class NetworkConstants:
         cls.SEGWIT_HRP = "bc"
         cls.HEADERS_URL = "https://download.faircoin.world/electrum/blockchain_headers"
         cls.GENESIS = "beed44fa5e96150d95d56ebd5d2625781825a9407a5215dd7eda723373a0a1d7"
-        cls.DEFAULT_PORTS = {'t': '50001', 's': '50002'}
+        cls.DEFAULT_PORTS = {'t': '51811', 's': '51812'}
         cls.DEFAULT_SERVERS = read_json_dict('servers.json')
 
     @classmethod
@@ -92,7 +92,7 @@ class NetworkConstants:
         cls.SEGWIT_HRP = "tb"
         cls.HEADERS_URL = "https://download.faircoin.world/electrum/blockchain_headers_testnet"
         cls.GENESIS = "42327d5edf3cbb75bb139ec78bd62e517f14d7cbad451e4778741b6b4c1dfbc6"
-        cls.DEFAULT_PORTS = {'t':'51001', 's':'51002'}
+        cls.DEFAULT_PORTS = {'t':'52811', 's':'52812'}
         cls.DEFAULT_SERVERS = read_json_dict('servers_testnet.json')
 
 
