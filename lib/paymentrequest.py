@@ -77,7 +77,7 @@ def get_payment_request(url):
             response.raise_for_status()
             # Guard against `bitcoin:`-URIs with invalid payment request URLs
             if "Content-Type" not in response.headers \
-            or response.headers["Content-Type"] != "application/bitcoin-paymentrequest":
+            or response.headers["Content-Type"] != "application/faircoin-paymentrequest":
                 data = None
                 error = "payment URL not pointing to a payment request handling server"
             else:
