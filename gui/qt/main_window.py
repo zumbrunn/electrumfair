@@ -537,8 +537,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
     def show_about(self):
         QMessageBox.about(self, "ElectrumFair",
             _("Version")+" %s" % (self.wallet.electrum_version) + "\n\n" +
-                _("Electrum's focus is speed, with low resource usage and simplifying FairCoin. You do not need to perform regular backups, because your wallet can be recovered from a secret phrase that you can memorize or write on paper. Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the FairCoin system."  + "\n\n" +
-                _("Uses icons from the Icons8 icon pack (icons8.com).")))
+                _("Electrum's focus is speed, with low resource usage and simplifying FairCoin. You do not need to perform regular backups, because your wallet can be recovered from a secret phrase that you can memorize or write on paper. Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the FairCoin system."  + "\n\n") +
+                _("Uses icons from the Icons8 icon pack (icons8.com)."))
 
     def show_report_bug(self):
         msg = ' '.join([
@@ -577,7 +577,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if self.tray:
             try:
                 # this requires Qt 5.9
-                self.tray.showMessage("Electrum", message, QIcon(":icons/electrum_dark_icon"), 20000)
+                self.tray.showMessage("Electrum", message, QIcon(":icons/electrumfair_dark_icon"), 20000)
             except TypeError:
                 self.tray.showMessage("Electrum", message, QSystemTrayIcon.Information, 20000)
 
