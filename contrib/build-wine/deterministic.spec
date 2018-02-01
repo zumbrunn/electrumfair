@@ -25,7 +25,7 @@ datas = [
     (home+'lib/servers_testnet.json', 'electrumfair'),
     (home+'lib/wordlist/english.txt', 'electrumfair/wordlist'),
     (home+'lib/locale', 'electrumfair/locale'),
-    (home+'plugins', 'electrum_plugins'),
+    (home+'plugins', 'electrumfair_plugins'),
 ]
 datas += collect_data_files('trezorlib')
 datas += collect_data_files('btchip')
