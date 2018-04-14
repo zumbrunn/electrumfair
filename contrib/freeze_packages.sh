@@ -14,10 +14,9 @@ for i in '' '-hw' '-binaries'; do
 
     echo "Installing $i dependencies"
 
-pushd $contrib/..
-python3 setup.py install
-popd
+    python -m pip install -r $contrib/requirements/requirements${i}.txt --upgrade
 
-pip3 freeze | sed '/^ElectrumFair/ d' > $contrib/requirements.txt
+    pip freeze | sed '/^ElectrumFair/ d' > $contrib/deterministic-build/requirements${i}.txt
+done
 
 echo "Done. Updated requirements"

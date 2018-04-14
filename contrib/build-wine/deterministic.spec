@@ -29,10 +29,13 @@ binaries += [b for b in collect_dynamic_libs('PyQt5') if 'qwindowsvista' in b[0]
 datas = [
     (home+'lib/currencies.json', 'electrumfair'),
     (home+'lib/servers.json', 'electrumfair'),
+    (home+'lib/checkpoints.json', 'electrumfair'),
     (home+'lib/servers_testnet.json', 'electrumfair'),
+    (home+'lib/checkpoints_testnet.json', 'electrumfair'),
     (home+'lib/wordlist/english.txt', 'electrumfair/wordlist'),
     (home+'lib/locale', 'electrumfair/locale'),
     (home+'plugins', 'electrumfair_plugins'),
+    ('C:\\Program Files (x86)\\ZBar\\bin\\', '.')
 ]
 datas += collect_data_files('trezorlib')
 datas += collect_data_files('btchip')

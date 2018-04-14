@@ -10,3 +10,4 @@ rm -r $contrib/../packages/
 
 #Install pure python modules in electrum directory
 pip3 install -r $contrib/requirements.txt -t $contrib/../packages
+
