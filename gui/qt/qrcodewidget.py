@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
 import os
 import qrcode
 
-import electrumfairfair
+import electrumfair
 from electrumfair.i18n import _
 from .util import WindowModalDialog
 

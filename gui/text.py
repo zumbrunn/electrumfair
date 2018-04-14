@@ -3,7 +3,7 @@ import curses, datetime, locale
 from decimal import Decimal
 import getpass
 
-import electrumfairfair
+import electrumfair
 from electrumfair.util import format_satoshis, set_verbosity
 from electrumfair.bitcoin import is_address, COIN, TYPE_ADDRESS
 from electrumfair import Wallet, WalletStorage

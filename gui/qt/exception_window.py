@@ -36,7 +36,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 
 from electrumfair.i18n import _
-from electrumfair import ELECTRUM_VERSION, bitcoin, constants
+from electrumfair import ELECTRUMFAIR_VERSION, bitcoin, constants
 
 from .util import MessageBoxMixin
 

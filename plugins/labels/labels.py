@@ -7,7 +7,7 @@ import traceback
 
 import base64
 
-import electrumfairfair
+import electrumfair
 from electrumfair.plugins import BasePlugin, hook
 from electrumfair.i18n import _
 

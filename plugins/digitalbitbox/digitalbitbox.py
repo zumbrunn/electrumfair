@@ -4,13 +4,13 @@
 #
 
 try:
-    import electrumfairfair
+    import electrumfair
     from electrumfair.bitcoin import TYPE_ADDRESS, push_script, var_int, msg_magic, Hash, verify_message, pubkey_from_signature, point_to_ser, public_key_to_p2pkh, EncodeAES, DecodeAES, MyVerifyingKey
     from electrumfair.bitcoin import serialize_xpub, deserialize_xpub
     from electrumfair import constants
     from electrumfair.transaction import Transaction
     from electrumfair.i18n import _
-    from electrumair.keystore import Hardware_KeyStore
+    from electrumfair.keystore import Hardware_KeyStore
     from ..hw_wallet import HW_PluginBase
     from electrumfair.util import print_error, to_string, UserCancelled
     from electrumfair.base_wizard import ScriptTypeNotSupported, HWD_SETUP_NEW_WALLET

@@ -30,7 +30,7 @@ import json
 from urllib.parse import urljoin
 from urllib.parse import quote
 
-import electrumfairfair
+import electrumfair
 from electrumfair import bitcoin
 from electrumfair import constants
 from electrumfair import keystore

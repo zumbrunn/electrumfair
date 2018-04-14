@@ -7,7 +7,7 @@ import traceback
 from decimal import Decimal
 import threading
 
-import electrumfairfair
+import electrumfair
 from electrumfair.bitcoin import TYPE_ADDRESS
 from electrumfair import WalletStorage, Wallet
 from electrumfair_gui.kivy.i18n import _

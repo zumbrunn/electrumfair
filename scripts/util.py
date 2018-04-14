@@ -1,5 +1,5 @@
 import select, time, queue
-# import electrumfairfair
+# import electrumfair
 from electrumfair import Connection, Interface, SimpleConfig
 
 from electrumfair.network import parse_servers
