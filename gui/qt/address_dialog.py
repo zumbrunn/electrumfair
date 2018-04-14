@@ -23,7 +23,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from electrum.i18n import _
+from electrumfair.i18n import _
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -93,6 +93,6 @@ class AddressDialog(WindowModalDialog):
     def show_qr(self):
         text = self.address
         try:
-            self.parent.show_qrcode(text, 'Address')
+            self.parent.show_qrcode(text, 'Address', parent=self)
         except Exception as e:
             self.show_message(str(e))

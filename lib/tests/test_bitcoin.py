@@ -11,8 +11,9 @@ from lib.bitcoin import (
     var_int, op_push, address_to_script, regenerate_key,
     verify_message, deserialize_privkey, serialize_privkey, is_segwit_address,
     is_b58_address, address_to_scripthash, is_minikey, is_compressed, is_xpub,
-    xpub_type, is_xprv, is_bip32_derivation, seed_type, NetworkConstants)
+    xpub_type, is_xprv, is_bip32_derivation, seed_type)
 from lib.util import bfh
+from lib import constants
 
 try:
     import ecdsa
@@ -176,12 +177,12 @@ class Test_bitcoin_testnet(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        NetworkConstants.set_testnet()
+        constants.set_testnet()
 
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        NetworkConstants.set_mainnet()
+        constants.set_mainnet()
 
     def test_address_to_script(self):
         # bech32 native segwit
@@ -279,6 +280,7 @@ class Test_keyImport(unittest.TestCase):
 
     priv_pub_addr = (
            {'priv': 'a87SJfG4zML2R7SVyAjfQvPpukx2D5UPWPBPgk5cwBH3jfdyvyyM',
+            #'exported_privkey': 'p2pkh:Kzj8VjwpZ99bQqVeUiRXrKuX9mLr1o6sWxFMCBJn1umC38BMiQTD',
             'pub': '0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2',
             'address': 'fJscruM2G12wCkM83jGg1r4voVYudncrfC',
             'minikey' : False,
@@ -319,6 +321,7 @@ class Test_keyImport(unittest.TestCase):
     def test_is_private_key(self):
         for priv_details in self.priv_pub_addr:
             self.assertTrue(is_private_key(priv_details['priv']))
+            self.assertTrue(is_private_key(priv_details['exported_privkey']))
             self.assertFalse(is_private_key(priv_details['pub']))
             self.assertFalse(is_private_key(priv_details['address']))
         self.assertFalse(is_private_key("not a privkey"))
@@ -327,8 +330,7 @@ class Test_keyImport(unittest.TestCase):
         for priv_details in self.priv_pub_addr:
             txin_type, privkey, compressed = deserialize_privkey(priv_details['priv'])
             priv2 = serialize_privkey(privkey, compressed, txin_type)
-            if not priv_details['minikey']:
-                self.assertEqual(priv_details['priv'], priv2)
+            self.assertEqual(priv_details['exported_privkey'], priv2)
 
     def test_address_to_scripthash(self):
         for priv_details in self.priv_pub_addr:

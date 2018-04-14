@@ -17,18 +17,16 @@ from kivy.lang import Builder
 from kivy.factory import Factory
 from kivy.utils import platform
 
-from electrum.util import profiler, parse_URI, format_time, InvalidPassword, NotEnoughFunds
-from electrum import bitcoin
-from electrum.util import timestamp_to_datetime
-from electrum.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
+from electrumfair.util import profiler, parse_URI, format_time, InvalidPassword, NotEnoughFunds
+from electrumfair import bitcoin
+from electrumair.util import timestamp_to_datetime
+from electrumfair.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
 
 from .context_menu import ContextMenu
 
 
-from electrum_gui.kivy.i18n import _
+from electrumair_gui.kivy.i18n import _
 
-class EmptyLabel(Factory.Label):
-    pass
 
 class CScreen(Factory.Screen):
     __events__ = ('on_activate', 'on_deactivate', 'on_enter', 'on_leave')
@@ -87,9 +85,9 @@ class CScreen(Factory.Screen):
         self.add_widget(self.context_menu)
 
 
+# note: this list needs to be kept in sync with another in qt
 TX_ICONS = [
-    "close",
-    "close",
+    "unconfirmed",
     "close",
     "unconfirmed",
     "close",
@@ -143,14 +141,13 @@ class HistoryScreen(CScreen):
         ri.icon = icon
         ri.date = status_str
         ri.message = label
-        ri.value = value or 0
-        ri.amount = self.app.format_amount(value, True) if value is not None else '--'
         ri.confirmations = conf
-        if self.app.fiat_unit and date:
-            rate = self.app.fx.history_rate(date)
-            if rate:
-                s = self.app.fx.value_str(value, rate)
-                ri.quote_text = '' if s is None else s + ' ' + self.app.fiat_unit
+        if value is not None:
+            ri.is_mine = value < 0
+            if value < 0: value = - value
+            ri.amount = self.app.format_amount_and_units(value)
+            if self.app.fiat_unit and date:
+                ri.quote_text = self.app.fx.historical_value_str(value, date) + ' ' + self.app.fx.ccy
         return ri
 
     def update(self, see_all=False):
@@ -162,12 +159,7 @@ class HistoryScreen(CScreen):
         count = 0
         for item in history:
             ri = self.get_card(*item)
-            count += 1
             history_card.add_widget(ri)
-
-        if count == 0:
-            msg = _('This screen shows your list of transactions. It is currently empty.')
-            history_card.add_widget(EmptyLabel(text=msg))
 
 
 class SendScreen(CScreen):
@@ -176,7 +168,7 @@ class SendScreen(CScreen):
     payment_request = None
 
     def set_URI(self, text):
-        import electrum
+        import electrumfair
         try:
             uri = electrumfair.util.parse_URI(text, self.app.on_pr)
         except:
@@ -218,14 +210,13 @@ class SendScreen(CScreen):
             # it sould be already saved
             return
         # save address as invoice
-        from electrum.paymentrequest import make_unsigned_request, PaymentRequest
+        from electrumfair.paymentrequest import make_unsigned_request, PaymentRequest
         req = {'address':self.screen.address, 'memo':self.screen.message}
         amount = self.app.get_amount(self.screen.amount) if self.screen.amount else 0
         req['amount'] = amount
         pr = make_unsigned_request(req).SerializeToString()
         pr = PaymentRequest(pr)
         self.app.wallet.invoices.add(pr)
-        self.app.update_tab('invoices')
         self.app.show_info(_("Invoice saved"))
         if pr.is_pr():
             self.screen.is_pr = True
@@ -301,7 +292,7 @@ class SendScreen(CScreen):
         def on_success(tx):
             if tx.is_complete():
                 self.app.broadcast(tx, self.payment_request)
-                self.app.wallet.set_label(tx.hash(), message)
+                self.app.wallet.set_label(tx.txid(), message)
             else:
                 self.app.tx_dialog(tx)
         def on_failure(error):
@@ -354,7 +345,7 @@ class ReceiveScreen(CScreen):
         Clock.schedule_once(lambda dt: self.update_qr())
 
     def get_URI(self):
-        from electrum.util import create_URI
+        from electrumfair.util import create_URI
         amount = self.screen.amount
         if amount:
             a, u = self.screen.amount.split()
@@ -379,15 +370,23 @@ class ReceiveScreen(CScreen):
 
     def save_request(self):
         addr = self.screen.address
+        if not addr:
+            return False
         amount = self.screen.amount
         message = self.screen.message
         amount = self.app.get_amount(amount) if amount else 0
         req = self.app.wallet.make_payment_request(addr, amount, message, None)
-        self.app.wallet.add_payment_request(req, self.app.electrum_config)
-        self.app.update_tab('requests')
+        try:
+            self.app.wallet.add_payment_request(req, self.app.electrum_config)
+            added_request = True
+        except Exception as e:
+            self.app.show_error(_('Error adding payment request') + ':\n' + str(e))
+            added_request = False
+        finally:
+            self.app.update_tab('requests')
+        return added_request
 
     def on_amount_or_message(self):
-        self.save_request()
         Clock.schedule_once(lambda dt: self.update_qr())
 
     def do_new(self):
@@ -587,7 +586,12 @@ class AddressScreen(CScreen):
     def ext_search(self, card, search):
         return card.memo.find(search) >= 0 or card.amount.find(search) >= 0
 
+=======
+>>>>>>> master
 
+    def do_save(self):
+        if self.save_request():
+            self.app.show_info(_('Request was saved.'))
 
 
 class TabbedCarousel(Factory.TabbedPanel):

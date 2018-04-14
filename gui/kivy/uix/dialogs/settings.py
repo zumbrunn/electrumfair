@@ -3,18 +3,17 @@ from kivy.factory import Factory
 from kivy.properties import ObjectProperty
 from kivy.lang import Builder
 
-from electrum.util import base_units
-from electrum.i18n import languages
-from electrum_gui.kivy.i18n import _
-from electrum.plugins import run_hook
-from electrum import coinchooser
-from electrum.util import fee_levels
+from electrumfair.util import base_units
+from electrumfair.i18n import languages
+from electrumfair_gui.kivy.i18n import _
+from electrumfair.plugins import run_hook
+from electrumfair import coinchooser
 
 from .choice_dialog import ChoiceDialog
 
 Builder.load_string('''
 #:import partial functools.partial
-#:import _ electrum_gui.kivy.i18n._
+#:import _ electrumfair_gui.kivy.i18n._
 
 <SettingsDialog@Popup>
     id: settings
@@ -37,9 +36,8 @@ Builder.load_string('''
                     action: partial(root.language_dialog, self)
                 CardSeparator
                 SettingsItem:
-                    status: '' if root.disable_pin else ('ON' if root.use_encryption else 'OFF')
                     disabled: root.disable_pin
-                    title: _('PIN code') + ': ' + self.status
+                    title: _('PIN code')
                     description: _("Change your PIN code.")
                     action: partial(root.change_password, self)
                 CardSeparator
@@ -90,12 +88,14 @@ Builder.load_string('''
                     description: _("Send your change to separate addresses.")
                     message: _('Send excess coins to change addresses')
                     action: partial(root.boolean_dialog, 'use_change', _('Use change addresses'), self.message)
-                CardSeparator
-                SettingsItem:
-                    status: root.coinselect_status()
-                    title: _('Coin selection') + ': ' + self.status
-                    description: "Coin selection method"
-                    action: partial(root.coinselect_dialog, self)
+
+                # disabled: there is currently only one coin selection policy
+                #CardSeparator
+                #SettingsItem:
+                #    status: root.coinselect_status()
+                #    title: _('Coin selection') + ': ' + self.status
+                #    description: "Coin selection method"
+                #    action: partial(root.coinselect_dialog, self)
 ''')
 
 
@@ -111,7 +111,6 @@ class SettingsDialog(Factory.Popup):
         layout.bind(minimum_height=layout.setter('height'))
         # cached dialogs
         self._fx_dialog = None
-        self._fee_dialog = None
         self._proxy_dialog = None
         self._language_dialog = None
         self._unit_dialog = None
@@ -202,18 +201,7 @@ class SettingsDialog(Factory.Popup):
         d.open()
 
     def fee_status(self):
-        if self.config.get('dynamic_fees', True):
-            return fee_levels[self.config.get('fee_level', 2)]
-        else:
-            return self.app.format_amount_and_units(self.config.fee_per_kb()) + '/kB'
-
-    def fee_dialog(self, label, dt):
-        if self._fee_dialog is None:
-            from .fee_dialog import FeeDialog
-            def cb():
-                label.status = self.fee_status()
-            self._fee_dialog = FeeDialog(self.app, self.config, cb)
-        self._fee_dialog.open()
+        return self.config.get_fee_status()
 
     def boolean_dialog(self, name, title, message, dt):
         from .checkbox_dialog import CheckBoxDialog

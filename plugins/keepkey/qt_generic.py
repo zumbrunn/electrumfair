@@ -4,14 +4,14 @@ import threading
 from PyQt5.Qt import Qt
 from PyQt5.Qt import QGridLayout, QInputDialog, QPushButton
 from PyQt5.Qt import QVBoxLayout, QLabel
-from electrum_gui.qt.util import *
+from electrumfair_gui.qt.util import *
 from .plugin import TIM_NEW, TIM_RECOVER, TIM_MNEMONIC
 from ..hw_wallet.qt import QtHandlerBase, QtPluginBase
 
-from electrum.i18n import _
-from electrum.plugins import hook, DeviceMgr
-from electrum.util import PrintError, UserCancelled, bh2u
-from electrum.wallet import Wallet, Standard_Wallet
+from electrumfair.i18n import _
+from electrumfair.plugins import hook, DeviceMgr
+from electrumfair.util import PrintError, UserCancelled, bh2u
+from electrumfair.wallet import Wallet, Standard_Wallet
 
 PASSPHRASE_HELP_SHORT =_(
     "Passphrases allow you to access new wallets, each "
@@ -194,7 +194,7 @@ class QtPlugin(QtPluginBase):
         if type(keystore) == self.keystore_class and len(addrs) == 1:
             def show_address():
                 keystore.thread.add(partial(self.show_address, wallet, addrs[0]))
-            menu.addAction(_("Show on %s") % self.device, show_address)
+            menu.addAction(_("Show on {}").format(self.device), show_address)
 
     def show_settings_dialog(self, window, keystore):
         device_id = self.choose_device(window, keystore)
@@ -227,7 +227,7 @@ class QtPlugin(QtPluginBase):
             bg = QButtonGroup()
             for i, count in enumerate([12, 18, 24]):
                 rb = QRadioButton(gb)
-                rb.setText(_("%d words") % count)
+                rb.setText(_("{} words").format(count))
                 bg.addButton(rb)
                 bg.setId(rb, i)
                 hbox1.addWidget(rb)
@@ -242,7 +242,7 @@ class QtPlugin(QtPluginBase):
             else:
                 msg = _("Enter the master private key beginning with xprv:")
                 def set_enabled():
-                    from electrum.keystore import is_xprv
+                    from electrumfair.keystore import is_xprv
                     wizard.next_button.setEnabled(is_xprv(clean_text(text)))
                 text.textChanged.connect(set_enabled)
                 next_enabled = False
@@ -250,7 +250,7 @@ class QtPlugin(QtPluginBase):
             vbox.addWidget(QLabel(msg))
             vbox.addWidget(text)
             pin = QLineEdit()
-            pin.setValidator(QRegExpValidator(QRegExp('[1-9]{0,10}')))
+            pin.setValidator(QRegExpValidator(QRegExp('[1-9]{0,9}')))
             pin.setMaximumWidth(100)
             hbox_pin = QHBoxLayout()
             hbox_pin.addWidget(QLabel(_("Enter your PIN (digits 1-9):")))
@@ -292,7 +292,7 @@ class SettingsDialog(WindowModalDialog):
     their PIN.'''
 
     def __init__(self, window, plugin, keystore, device_id):
-        title = _("%s Settings") % plugin.device
+        title = _("{} Settings").format(plugin.device)
         super(SettingsDialog, self).__init__(window, title)
         self.setMaximumWidth(540)
 
@@ -457,9 +457,9 @@ class SettingsDialog(WindowModalDialog):
         settings_glayout = QGridLayout()
 
         # Settings tab - Label
-        label_msg = QLabel(_("Name this %s.  If you have mutiple devices "
+        label_msg = QLabel(_("Name this {}.  If you have mutiple devices "
                              "their labels help distinguish them.")
-                           % plugin.device)
+                           .format(plugin.device))
         label_msg.setWordWrap(True)
         label_label = QLabel(_("Device Label"))
         label_edit = QLineEdit()
@@ -482,7 +482,7 @@ class SettingsDialog(WindowModalDialog):
         pin_msg = QLabel(_("PIN protection is strongly recommended.  "
                            "A PIN is your only protection against someone "
                            "stealing your bitcoins if they obtain physical "
-                           "access to your %s.") % plugin.device)
+                           "access to your {}.").format(plugin.device))
         pin_msg.setWordWrap(True)
         pin_msg.setStyleSheet("color: red")
         settings_glayout.addWidget(pin_msg, 3, 1, 1, -1)
@@ -497,8 +497,8 @@ class SettingsDialog(WindowModalDialog):
             homescreen_clear_button.clicked.connect(clear_homescreen)
             homescreen_msg = QLabel(_("You can set the homescreen on your "
                                       "device to personalize it.  You must "
-                                      "choose a %d x %d monochrome black and "
-                                      "white image.") % (hs_rows, hs_cols))
+                                      "choose a {} x {} monochrome black and "
+                                      "white image.").format(hs_rows, hs_cols))
             homescreen_msg.setWordWrap(True)
             settings_glayout.addWidget(homescreen_label, 4, 0)
             settings_glayout.addWidget(homescreen_change_button, 4, 1)
@@ -541,7 +541,7 @@ class SettingsDialog(WindowModalDialog):
         clear_pin_button.clicked.connect(clear_pin)
         clear_pin_warning = QLabel(
             _("If you disable your PIN, anyone with physical access to your "
-              "%s device can spend your bitcoins.") % plugin.device)
+              "{} device can spend your bitcoins.").format(plugin.device))
         clear_pin_warning.setWordWrap(True)
         clear_pin_warning.setStyleSheet("color: red")
         advanced_glayout.addWidget(clear_pin_button, 0, 2)

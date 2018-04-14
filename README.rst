@@ -16,7 +16,9 @@ Electrum - Lightweight FairCoin client
 .. image:: https://coveralls.io/repos/github/spesmilo/electrum/badge.svg?branch=master
     :target: https://coveralls.io/github/spesmilo/electrum?branch=master
     :alt: Test coverage statistics
-
+.. image:: https://img.shields.io/badge/help-translating-blue.svg
+    :target: https://crowdin.com/project/electrum
+    :alt: Help translating Electrum online
 
 
 
@@ -75,7 +77,7 @@ Compile the protobuf description file::
 
 Create translations (optional)::
 
-    sudo apt-get install python-pycurl gettext
+    sudo apt-get install python-requests gettext
     ./contrib/make_locale
 
 
@@ -112,20 +114,13 @@ This directory contains the python dependencies used by Electrum.
 Mac OS X / macOS
 --------
 
-::
+See `contrib/build-osx/`.
 
-    # On MacPorts installs: 
-    sudo python3 setup-release.py py2app
-    
-    # On Homebrew installs: 
-    ARCHFLAGS="-arch i386 -arch x86_64" sudo python3 setup-release.py py2app --includes sip
-    
-    sudo hdiutil create -fs HFS+ -volname "ElectrumFair" -srcfolder dist/ElectrumFair.app dist/electrumfair-VERSION-macosx.dmg
 
 Windows
 -------
 
-See `contrib/build-wine/README` file.
+See `contrib/build-wine/`.
 
 
 Android

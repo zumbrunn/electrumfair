@@ -31,12 +31,12 @@ from decimal import Decimal
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-from electrum_gui.qt.util import *
-from electrum_gui.qt.qrcodewidget import QRCodeWidget
-from electrum_gui.qt.amountedit import AmountEdit
-from electrum_gui.qt.main_window import StatusBarButton
-from electrum.i18n import _
-from electrum.plugins import hook
+from electrumfair_gui.qt.util import *
+from electrumfair_gui.qt.qrcodewidget import QRCodeWidget
+from electrumfair_gui.qt.amountedit import AmountEdit
+from electrumfair_gui.qt.main_window import StatusBarButton
+from electrumfair.i18n import _
+from electrumfair.plugins import hook
 from .trustedcoin import TrustedCoinPlugin, server
 
 
@@ -173,7 +173,7 @@ class Plugin(TrustedCoinPlugin):
             i += 1
 
         n = wallet.billing_info.get('tx_remaining', 0)
-        grid.addWidget(QLabel(_("Your wallet has %d prepaid transactions.")%n), i, 0)
+        grid.addWidget(QLabel(_("Your wallet has {} prepaid transactions.").format(n)), i, 0)
         vbox.addLayout(Buttons(CloseButton(d)))
         d.exec_()
 

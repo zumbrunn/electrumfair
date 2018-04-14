@@ -5,9 +5,9 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.label import Label
 
-from electrum_gui.kivy.i18n import _
+from electrumfair_gui.kivy.i18n import _
 from datetime import datetime
-from electrum.util import InvalidPassword
+from electrumfair.util import InvalidPassword
 
 Builder.load_string('''
 
@@ -20,6 +20,7 @@ Builder.load_string('''
     can_rbf: False
     fee_str: ''
     date_str: ''
+    date_label:''
     amount_str: ''
     tx_hash: ''
     status_str: ''
@@ -46,7 +47,7 @@ Builder.load_string('''
                         text: _('Description') if root.description else ''
                         value: root.description
                     BoxLabel:
-                        text: _('Date') if root.date_str else ''
+                        text: root.date_label
                         value: root.date_str
                     BoxLabel:
                         text: _('Amount sent') if root.is_mine else _('Amount received')
@@ -110,10 +111,13 @@ class TxDialog(Factory.Popup):
         tx_hash, self.status_str, self.description, self.can_broadcast, self.can_rbf, amount, fee, height, conf, timestamp, exp_n = self.wallet.get_tx_info(self.tx)
         self.tx_hash = tx_hash or ''
         if timestamp:
+            self.date_label = _('Date')
             self.date_str = datetime.fromtimestamp(timestamp).isoformat(' ')[:-3]
         elif exp_n:
-            self.date_str = _('Within %d blocks') % exp_n if exp_n > 0 else _('unknown (low fee)')
+            self.date_label = _('Mempool depth')
+            self.date_str = _('{} from tip').format('%.2f MB'%(exp_n/1000000))
         else:
+            self.date_label = ''
             self.date_str = ''
 
         if amount is None:
@@ -171,7 +175,7 @@ class TxDialog(Factory.Popup):
         self.app.broadcast(self.tx)
 
     def show_qr(self):
-        from electrum.bitcoin import base_encode, bfh
+        from electrumfair.bitcoin import base_encode, bfh
         text = bfh(str(self.tx))
         text = base_encode(text, base=43)
         self.app.qr_dialog(_("Raw Transaction"), text)

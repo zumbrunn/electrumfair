@@ -16,9 +16,7 @@ env/
 .tox/
 .buildozer/
 bin/
-.project
-.pydevproject
-.settings/
+/app.fil
 
 # tox files
 .cache/

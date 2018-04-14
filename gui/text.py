@@ -3,10 +3,10 @@ import curses, datetime, locale
 from decimal import Decimal
 import getpass
 
-import electrum
-from electrum.util import format_satoshis, set_verbosity
-from electrum.bitcoin import is_address, COIN, TYPE_ADDRESS
-from electrum import Wallet, WalletStorage
+import electrumfairfair
+from electrumfair.util import format_satoshis, set_verbosity
+from electrumfair.bitcoin import is_address, COIN, TYPE_ADDRESS
+from electrumfair import Wallet, WalletStorage
 
 _ = lambda x:x
 
@@ -346,7 +346,7 @@ class ElectrumGui:
             return
 
         if self.str_description:
-            self.wallet.labels[tx.hash()] = self.str_description
+            self.wallet.labels[tx.txid()] = self.str_description
 
         self.show_message(_("Please wait..."), getchar=False)
         status, msg = self.network.broadcast(tx)

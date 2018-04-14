@@ -8,8 +8,8 @@ from PyQt5.QtWidgets import (
 import os
 import qrcode
 
-import electrum
-from electrum.i18n import _
+import electrumfairfair
+from electrumfair.i18n import _
 from .util import WindowModalDialog
 
 
@@ -113,8 +113,7 @@ class QRDialog(WindowModalDialog):
 
             def copy_to_clipboard():
                 p = qscreen.grabWindow(qrw.winId())
-                p.save(filename, 'png')
-                QApplication.clipboard().setImage(QImage(filename))
+                QApplication.clipboard().setPixmap(p)
                 self.show_message(_("QR code copied to clipboard"))
 
             b = QPushButton(_("Copy"))

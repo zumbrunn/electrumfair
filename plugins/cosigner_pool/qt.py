@@ -30,23 +30,19 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QPushButton
 
-from electrum import bitcoin, util
-from electrum import transaction
-from electrum.plugins import BasePlugin, hook
-from electrum.i18n import _
-from electrum.wallet import Multisig_Wallet
-from electrum.util import bh2u, bfh
+from electrumfair import bitcoin, util
+from electrumfair import transaction
+from electrumfair.plugins import BasePlugin, hook
+from electrumfair.i18n import _
+from electrumfair.wallet import Multisig_Wallet
+from electrumfair.util import bh2u, bfh
 
-from electrum_gui.qt.transaction_dialog import show_transaction
+from electrumfair_gui.qt.transaction_dialog import show_transaction
 
 import sys
 import traceback
 
-
-PORT = 12344
-HOST = 'cosigner-pool.faircoin.world'
-server = ServerProxy('http://%s:%d'%(HOST,PORT), allow_none=True)
-
+server = ServerProxy('cosigner-pool.faircoin.world', allow_none=True)
 
 class Listener(util.DaemonThread):
 
@@ -162,7 +158,7 @@ class Plugin(BasePlugin):
             d.cosigner_send_button.hide()
 
     def cosigner_can_sign(self, tx, cosigner_xpub):
-        from electrum.keystore import is_xpubkey, parse_xpubkey
+        from electrumfair.keystore import is_xpubkey, parse_xpubkey
         xpub_set = set([])
         for txin in tx.inputs():
             for x_pubkey in txin['x_pubkeys']:
@@ -175,7 +171,8 @@ class Plugin(BasePlugin):
         for window, xpub, K, _hash in self.cosigner_list:
             if not self.cosigner_can_sign(tx, xpub):
                 continue
-            message = bitcoin.encrypt_message(bfh(tx.raw), bh2u(K)).decode('ascii')
+            raw_tx_bytes = bfh(str(tx))
+            message = bitcoin.encrypt_message(raw_tx_bytes, bh2u(K)).decode('ascii')
             try:
                 server.put(_hash, message)
             except Exception as e:
@@ -194,7 +191,7 @@ class Plugin(BasePlugin):
             return
 
         wallet = window.wallet
-        if wallet.has_password():
+        if wallet.has_keystore_encryption():
             password = window.password_dialog('An encrypted transaction was retrieved from cosigning pool.\nPlease enter your password to decrypt it.')
             if not password:
                 return
