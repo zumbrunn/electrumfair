@@ -195,7 +195,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.new_fx_history_signal.connect(self.on_fx_history)
 
         # update fee slider in case we missed the callback
-        self.fee_slider.update()
+        #self.fee_slider.update()
         self.load_wallet(wallet)
         self.connect_slots(gui_object.timer)
         self.config.set_key('dynamic_fees', True)
@@ -1333,7 +1333,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             # Displayed fee/fee_rate values are set according to user input.
             # Due to rounding or dropping dust in CoinChooser,
             # actual fees often differ somewhat.
-            if freeze_feerate or self.fee_slider.is_active():
+            if freeze_feerate: #or self.fee_slider.is_active():
                 displayed_feerate = self.feerate_e.get_amount()
                 if displayed_feerate:
                     displayed_feerate = displayed_feerate // 1000
@@ -1516,12 +1516,12 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if use_rbf:
             tx.set_rbf(True)
 
-        if fee < self.wallet.relayfee() * tx.estimated_size() / 1000:
-            self.show_error('\n'.join([
-                _("This transaction requires a higher fee, or it will not be propagated by your current server"),
-                _("Try to raise your transaction fee, or use a server with a lower relay fee.")
-            ]))
-            return
+        #if fee < self.wallet.relayfee() * tx.estimated_size() / 1000:
+        #    self.show_error('\n'.join([
+        #        _("This transaction requires a higher fee, or it will not be propagated by your current server"),
+        #        _("Try to raise your transaction fee, or use a server with a lower relay fee.")
+        #    ]))
+        #    return
 
         if preview:
             self.show_transaction(tx, tx_desc)

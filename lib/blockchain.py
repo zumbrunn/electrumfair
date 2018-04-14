@@ -157,18 +157,18 @@ class Blockchain(util.PrintError):
             raise BaseException("prev hash mismatch: %s vs %s" % (prev_hash, header.get('prev_block_hash')))
         if constants.net.TESTNET:
             return
-        bits = self.target_to_bits(target)
-        if bits != header.get('bits'):
-            raise BaseException("bits mismatch: %s vs %s" % (bits, header.get('bits')))
-        if int('0x' + _hash, 16) > target:
-            raise BaseException("insufficient proof of work: %s vs target %s" % (int('0x' + _hash, 16), target))
+        #bits = self.target_to_bits(target)
+        #if bits != header.get('bits'):
+        #    raise BaseException("bits mismatch: %s vs %s" % (bits, header.get('bits')))
+        #if int('0x' + _hash, 16) > target:
+        #    raise BaseException("insufficient proof of work: %s vs target %s" % (int('0x' + _hash, 16), target))
 
     def verify_chunk(self, index, data):
-        num = len(data) // 80
+        num = len(data) // HEADER_SIZE
         prev_hash = self.get_hash(index * 2016 - 1)
         target = self.get_target(index-1)
         for i in range(num):
-            raw_header = data[i*80:(i+1) * 80]
+            raw_header = data[i*HEADER_SIZE:(i+1) * HEADER_SIZE]
             header = deserialize_header(raw_header, index*2016 + i)
             self.verify_header(header, prev_hash, target)
             prev_hash = hash_header(header)
@@ -226,7 +226,7 @@ class Blockchain(util.PrintError):
         filename = self.path()
         with self.lock:
             with open(filename, 'rb+') as f:
-                if truncate and offset != self._size*80:
+                if truncate and offset != self._size*HEADER_SIZE:
                     f.seek(offset)
                     f.truncate()
                 f.seek(offset)
@@ -287,6 +287,7 @@ class Blockchain(util.PrintError):
         if index < len(self.checkpoints):
             h, t = self.checkpoints[index]
             return t
+        return MAX_TARGET
         # new target
         first = self.read_header(index * 2016)
         last = self.read_header(index * 2016 + 2015)

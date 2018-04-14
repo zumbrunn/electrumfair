@@ -10,14 +10,14 @@ from .util import (user_dir, print_error, PrintError,
                    NoDynamicFeeEstimates, format_satoshis)
 from .i18n import _
 
-FEE_ETA_TARGETS = [25, 10, 5, 2]
+FEE_ETA_TARGETS = [1, 1, 1, 1]
 FEE_DEPTH_TARGETS = [10000000, 5000000, 2000000, 1000000, 500000, 200000, 100000]
 
 # satoshi per kbyte
-FEERATE_MAX_DYNAMIC = 1500000
-FEERATE_WARNING_HIGH_FEE = 600000
-FEERATE_FALLBACK_STATIC_FEE = 150000
-FEERATE_DEFAULT_RELAY = 1000
+FEERATE_MAX_DYNAMIC = 15000000
+FEERATE_WARNING_HIGH_FEE = 10000000
+FEERATE_FALLBACK_STATIC_FEE = 800000
+FEERATE_DEFAULT_RELAY = 800000
 FEERATE_STATIC_VALUES = [5000, 10000, 20000, 30000, 50000, 70000, 100000, 150000, 200000, 300000]
 
 
@@ -62,7 +62,7 @@ class SimpleConfig(PrintError):
         self.fee_estimates = {}
         self.fee_estimates_last_updated = {}
         self.last_time_fee_estimates_requested = 0  # zero ensures immediate fees
-        self.transaction_fee = 1000000 # let's have a reasonable start value
+        self.transaction_fee = 2000000 # let's have a reasonable start value
 
         # The following two functions are there for dependency injection when
         # testing.
@@ -291,15 +291,15 @@ class SimpleConfig(PrintError):
     @impose_hard_limits_on_fee
     def eta_to_fee(self, i):
         """Returns fee in sat/kbyte."""
-        if i < 4:
-            j = FEE_ETA_TARGETS[i]
-            fee = self.fee_estimates.get(j)
-        else:
-            assert i == 4
-            fee = self.fee_estimates.get(2)
-            if fee is not None:
-                fee += fee/2
-        return fee
+        #if i < 4:
+        #    j = FEE_ETA_TARGETS[i]
+        #    fee = self.fee_estimates.get(j)
+        #else:
+        #    assert i == 4
+        #    fee = self.fee_estimates.get(2)
+        #    if fee is not None:
+        #        fee += fee/2
+        return self.fee_estimates(1)
 
     def fee_to_depth(self, target_fee):
         depth = 0
@@ -353,7 +353,7 @@ class SimpleConfig(PrintError):
             return _('Within {} blocks').format(x)
 
     def get_fee_status(self):
-        dyn = self.is_dynfee()
+        dyn = False #self.is_dynfee()
         mempool = self.use_mempool_fees()
         pos = self.get_depth_level() if mempool else self.get_fee_level()
         fee_rate = self.fee_per_kb()
@@ -439,13 +439,13 @@ class SimpleConfig(PrintError):
         """Returns sat/kvB fee to pay for a txn.
         Note: might return None.
         """
-        if self.is_dynfee():
-            if self.use_mempool_fees():
-                fee_rate = self.depth_to_fee(self.get_depth_level())
-            else:
-                fee_rate = self.eta_to_fee(self.get_fee_level())
-        else:
-            fee_rate = self.get('fee_per_kb', FEERATE_FALLBACK_STATIC_FEE)
+        #if self.is_dynfee():
+        #    if self.use_mempool_fees():
+        #        fee_rate = self.depth_to_fee(self.get_depth_level())
+        #    else:
+        #        fee_rate = self.eta_to_fee(self.get_fee_level())
+        #else:
+        fee_rate = self.get('fee_per_kb', FEERATE_FALLBACK_STATIC_FEE)
         return fee_rate
 
     def fee_per_byte(self):
