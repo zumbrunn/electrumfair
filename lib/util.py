@@ -497,8 +497,8 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'Chain Fair': ('http://chain.fair.to',
-                        {'tx': 'transaction', 'addr': 'address'}),
+    'Chain Fair': ('http://chain.fair.to/',
+                        {'tx': 'transaction?transaction=', 'addr': 'address?address='}),
     'system default': ('blockchain:',
                         {'tx': 'tx', 'addr': 'address'}),
 }
