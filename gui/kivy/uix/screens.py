@@ -168,7 +168,7 @@ class SendScreen(CScreen):
     payment_request = None
 
     def set_URI(self, text):
-        import electrumfairfairfairfairfairfair
+        import electrumfair
         try:
             uri = electrumfair.util.parse_URI(text, self.app.on_pr)
         except:
