@@ -1,10 +1,13 @@
 #!/bin/bash
 
-NAME_ROOT=electrum
+NAME_ROOT=electrumfair
 PYTHON_VERSION=3.5.4
 
 if [ "$#" -gt 0 ]; then
-    BRANCH="$1"
+    VERSION="$1"
+else
+    echo "please provide version number to build"
+    exit 1
 fi
 
 # These settings probably don't need any change
@@ -17,70 +20,42 @@ PYTHON="wine $PYHOME/python.exe -OO -B"
 
 
 # Let's begin!
-cd `dirname $0`
+# cd `dirname $0`
 set -e
 
+if [ -d "tmp" ]; then
+    rm -rf tmp
+fi
+
+mkdir tmp
 cd tmp
 
-for repo in electrum electrum-locale electrum-icons; do
-    if [ -d $repo ]; then
-	cd $repo
-	git pull
-	git checkout master
-	cd ..
-    else
-	URL=https://github.com/spesmilo/$repo.git
-	git clone -b master $URL $repo
-    fi
-done
+echo -n "Downloading latest release..."
+wget -cq "https://download.faircoin.world/electrum/ElectrumFair-$VERSION.tar.gz"
+echo "done."
+tar xvf ElectrumFair-$VERSION.tar.gz
+cd ElectrumFair-$VERSION
 
-pushd electrum-locale
-for i in ./locale/*; do
-    dir=$i/LC_MESSAGES
-    mkdir -p $dir
-    msgfmt --output-file=$dir/electrum.mo $i/electrum.po || true
-done
-popd
+cp -r lib/locale $WINEPREFIX/drive_c/electrumfair/lib
+cp gui/qt/icons_rc.py $WINEPREFIX/drive_c/electrumfair/gui/qt
+cp -r packages $WINEPREFIX/drive_c/electrumfair
 
-pushd electrum
-git checkout $BRANCH
-VERSION=`git describe --tags`
-echo "Last commit: $VERSION"
-find -exec touch -d '2000-11-11T11:11:11+00:00' {} +
-popd
-
-rm -rf $WINEPREFIX/drive_c/electrum
-cp -r electrum $WINEPREFIX/drive_c/electrum
-cp electrum/LICENCE .
-cp -r electrum-locale/locale $WINEPREFIX/drive_c/electrum/lib/
-cp electrum-icons/icons_rc.py $WINEPREFIX/drive_c/electrum/gui/qt/
+cd ../..
 
 # Install frozen dependencies
-$PYTHON -m pip install -r ../../requirements.txt
+$PYTHON -m pip install -r contrib/requirements.txt
 
-pushd $WINEPREFIX/drive_c/electrum
+cd $WINEPREFIX/drive_c/electrumfair
 $PYTHON setup.py install
-popd
 
-cd ..
-
-rm -rf dist/
+rm -rf tmp
+rm -rf dist
 
 # build standalone and portable versions
-wine "C:/python$PYTHON_VERSION/scripts/pyinstaller.exe" --noconfirm --ascii --name $NAME_ROOT-$VERSION -w deterministic.spec
-
-# set timestamps in dist, in order to make the installer reproducible
-pushd dist
-find -exec touch -d '2000-11-11T11:11:11+00:00' {} +
-popd
+wine "C:/python$PYTHON_VERSION/scripts/pyinstaller.exe" --noconfirm --ascii --name $NAME_ROOT-$VERSION -w $WINEPREFIX/drive_c/electrumfair/contrib/build-wine/deterministic.spec
 
 # build NSIS installer
 # $VERSION could be passed to the electrum.nsi script, but this would require some rewriting in the script iself.
-wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION electrum.nsi
+wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION C:\\electrumfair\\contrib\\build-wine\\electrum.nsi
 
-cd dist
-mv electrum-setup.exe $NAME_ROOT-$VERSION-setup.exe
-cd ..
-
-echo "Done."
-md5sum dist/electrum*exe
+echo "the final build is in the 'dist' folder"

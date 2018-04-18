@@ -87,7 +87,7 @@ exe_portable = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.datas + [ ('is_portable', 'README.md', 'DATA' ) ],
+    a.datas + [ ('is_portable', home+'README.rst', 'DATA' ) ],
     name=os.path.join('build\\pyi.win32\\electrumfair', cmdline_name + "-portable.exe"),
     debug=False,
     strip=None,
