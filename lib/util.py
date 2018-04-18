@@ -539,12 +539,12 @@ def parse_URI(uri, on_pr=None):
 
     if ':' not in uri:
         if not bitcoin.is_address(uri):
-            raise BaseException("Not a FairCoin address")
+            raise Exception("Not a FairCoin address")
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
     if u.scheme != 'faircoin':
-        raise BaseException("Not a FairCoin URI")
+        raise Exception("Not a FairCoin URI")
     address = u.path
 
     # python for android fails to parse query
@@ -561,7 +561,7 @@ def parse_URI(uri, on_pr=None):
     out = {k: v[0] for k, v in pq.items()}
     if address:
         if not bitcoin.is_address(address):
-            raise BaseException("Invalid FairCoin address:" + address)
+            raise Exception("Invalid FairCoin address:" + address)
         out['address'] = address
     if 'amount' in out:
         am = out['amount']
@@ -708,10 +708,6 @@ class SocketPipe:
                 out = out[sent:]
             except ssl.SSLError as e:
                 print_error("SSLError:", e)
-                time.sleep(0.1)
-                continue
-            except OSError as e:
-                print_error("OSError", e)
                 time.sleep(0.1)
                 continue
 
