@@ -565,12 +565,12 @@ def parse_URI(uri, on_pr=None):
 
     if ':' not in uri:
         if not bitcoin.is_address(uri):
-            raise BaseException("Not a bitcoin address")
+            raise Exception("Not a bitcoin address")
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
     if u.scheme != 'bitcoin':
-        raise BaseException("Not a bitcoin URI")
+        raise Exception("Not a bitcoin URI")
     address = u.path
 
     # python for android fails to parse query
@@ -587,7 +587,7 @@ def parse_URI(uri, on_pr=None):
     out = {k: v[0] for k, v in pq.items()}
     if address:
         if not bitcoin.is_address(address):
-            raise BaseException("Invalid bitcoin address:" + address)
+            raise Exception("Invalid bitcoin address:" + address)
         out['address'] = address
     if 'amount' in out:
         am = out['amount']
@@ -734,10 +734,6 @@ class SocketPipe:
                 out = out[sent:]
             except ssl.SSLError as e:
                 print_error("SSLError:", e)
-                time.sleep(0.1)
-                continue
-            except OSError as e:
-                print_error("OSError", e)
                 time.sleep(0.1)
                 continue
 

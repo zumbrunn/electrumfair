@@ -188,7 +188,7 @@ class Ledger_Client():
                 self.perform_hw1_preflight()
             except BTChipException as e:
                 if (e.sw == 0x6d00 or e.sw == 0x6700):
-                    raise BaseException(_("Device not in Bitcoin mode")) from e
+                    raise Exception(_("Device not in Bitcoin mode")) from e
                 raise e
             self.preflightDone = True
 
@@ -350,6 +350,9 @@ class Ledger_KeyStore(Hardware_KeyStore):
                 self.give_error("No matching x_key for sign_transaction") # should never happen
 
             redeemScript = Transaction.get_preimage_script(txin)
+            if txin.get('prev_tx') is None:  # and not Transaction.is_segwit_input(txin):
+                # note: offline signing does not work atm even with segwit inputs for ledger
+                raise Exception(_('Offline signing with {} is not supported.').format(self.device))
             inputs.append([txin['prev_tx'].raw, txin['prevout_n'], redeemScript, txin['prevout_hash'], signingPos, txin.get('sequence', 0xffffffff - 1) ])
             inputsPaths.append(hwAddress)
             pubKeys.append(pubkeys)
@@ -541,7 +544,7 @@ class LedgerPlugin(HW_PluginBase):
             if device.interface_number == 0 or device.usage_page == 0xffa0:
                 ledger = True
             else:
-                return None  # non-compatible interface of a nano s or blue
+                return None  # non-compatible interface of a Nano S or Blue
         dev = hid.device()
         dev.open_path(device.path)
         dev.set_nonblocking(True)
@@ -573,7 +576,6 @@ class LedgerPlugin(HW_PluginBase):
 
     def get_client(self, keystore, force_pair=True):
         # All client interaction should not be in the main GUI thread
-        #assert self.main_thread != threading.current_thread()
         devmgr = self.device_manager()
         handler = keystore.handler
         with devmgr.hid_lock:
