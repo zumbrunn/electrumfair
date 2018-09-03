@@ -4,10 +4,9 @@
 build/
 dist/
 *.egg/
-/electrum.py
 contrib/pyinstaller/
 ElectrumFair.egg-info/
-gui/qt/icons_rc.py
+electrumfair/gui/qt/icons_rc.py
 locale/
 .devlocaltmp/
 *_trial_temp

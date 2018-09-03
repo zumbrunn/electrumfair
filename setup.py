@@ -2,12 +2,15 @@
 
 # python setup.py sdist --format=zip,gztar
 
-from setuptools import setup
 import os
 import sys
 import platform
 import imp
 import argparse
+import subprocess
+
+from setuptools import setup, find_packages
+from setuptools.command.install import install
 
 with open('contrib/requirements/requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -15,7 +18,7 @@ with open('contrib/requirements/requirements.txt') as f:
 with open('contrib/requirements/requirements-hw.txt') as f:
     requirements_hw = f.read().splitlines()
 
-version = imp.load_source('version', 'lib/version.py')
+version = imp.load_source('version', 'electrumfair/version.py')
 
 if sys.version_info[:3] < (3, 4, 0):
     sys.exit("Error: ElectrumFair requires Python version >= 3.4.0...")
@@ -43,9 +46,26 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
 extras_require = {
     'hardware': requirements_hw,
     'fast': ['pycryptodomex'],
-    ':python_version < "3.5"': ['typing>=3.0.0'],
+    'gui': ['pyqt5'],
 }
-extras_require['full'] = extras_require['hardware'] + extras_require['fast']
+extras_require['full'] = [pkg for sublist in list(extras_require.values()) for pkg in sublist]
+
+
+class CustomInstallCommand(install):
+    def run(self):
+        install.run(self)
+        # potentially build Qt icons file
+        try:
+            import PyQt5
+        except ImportError:
+            pass
+        else:
+            try:
+                path = os.path.join(self.install_lib, "electrum/gui/qt/icons_rc.py")
+                if not os.path.exists(path):
+                    subprocess.call(["pyrcc5", "icons.qrc", "-o", path])
+            except Exception as e:
+                print('Warning: building icons file failed with {}'.format(e))
 
 
 setup(
@@ -55,27 +75,12 @@ setup(
     extras_require=extras_require,
     packages=[
         'electrumfair',
-        'electrumfair_gui',
-        'electrumfair_gui.qt',
-        'electrumfair_plugins',
-        'electrumfair_plugins.audio_modem',
-        'electrumfair_plugins.cosigner_pool',
-        'electrumfair_plugins.email_requests',
-        'electrumfair_plugins.greenaddress_instant',
-        'electrumfair_plugins.hw_wallet',
-        'electrumfair_plugins.keepkey',
-        'electrumfair_plugins.labels',
-        'electrumfair_plugins.ledger',
-        'electrumfair_plugins.revealer',
-        'electrumfair_plugins.trezor',
-        'electrumfair_plugins.digitalbitbox',
-        'electrumfair_plugins.trustedcoin',
-        'electrumfair_plugins.virtualkeyboard',
-    ],
+        'electrumfair.gui',
+        'electrumfair.gui.qt',
+        'electrumfair.plugins',
+    ] + [('electrumfair.plugins.'+pkg) for pkg in find_packages('electrumfair/plugins')],
     package_dir={
-        'electrumfair': 'lib',
-        'electrumfair_gui': 'gui',
-        'electrumfair_plugins': 'plugins',
+        'electrumfair': 'electrumfair'
     },
     package_data={
         '': ['*.txt', '*.json', '*.ttf', '*.otf'],
@@ -84,7 +89,7 @@ setup(
             'locale/*/LC_MESSAGES/electrum.mo',
         ],
     },
-    scripts=['electrumfair'],
+    scripts=['electrumfair/electrumfair'],
     data_files=data_files,
     description="Lightweight FairCoin Wallet",
     author="Thomas Voegtlin, Thomas König (FairCoin)",
@@ -92,4 +97,7 @@ setup(
     license="MIT Licence",
     url="https://download.faircoin.world",
     long_description="""Lightweight FairCoin Wallet"""
+    cmdclass={
+        'install': CustomInstallCommand,
+    },
 )
