@@ -19,19 +19,36 @@ set -e
 mkdir -p tmp
 cd tmp
 
-for repo in electrum electrum-locale electrum-icons; do
-    if [ -d $repo ]; then
-	cd $repo
-	git pull
-	git checkout master
-	cd ..
-    else
-	URL=https://github.com/spesmilo/$repo.git
-	git clone -b master $URL $repo
-    fi
-done
+if [ -d ./electrum ]; then
+  rm ./electrum -rf
+fi
 
-pushd electrum-locale
+git clone https://github.com/spesmilo/electrum -b master
+
+pushd electrum
+if [ ! -z "$1" ]; then
+    # a commit/tag/branch was specified
+    if ! git cat-file -e "$1" 2> /dev/null
+    then  # can't find target
+        # try pull requests
+        git config --local --add remote.origin.fetch '+refs/pull/*/merge:refs/remotes/origin/pr/*'
+        git fetch --all
+    fi
+    git checkout $1
+fi
+
+# Load electrum-icons and electrum-locale for this release
+git submodule init
+git submodule update
+
+VERSION=`git describe --tags --dirty`
+echo "Last commit: $VERSION"
+
+pushd ./contrib/deterministic-build/electrum-locale
+if ! which msgfmt > /dev/null 2>&1; then
+    echo "Please install gettext"
+    exit 1
+fi
 for i in ./locale/*; do
     dir=$i/LC_MESSAGES
     mkdir -p $dir
@@ -39,21 +56,14 @@ for i in ./locale/*; do
 done
 popd
 
-pushd electrum
-if [ ! -z "$1" ]; then
-    git checkout $1
-fi
-
-VERSION=`git describe --tags --dirty`
-echo "Last commit: $VERSION"
 find -exec touch -d '2000-11-11T11:11:11+00:00' {} +
 popd
 
 rm -rf $WINEPREFIX/drive_c/electrum
 cp -r electrum $WINEPREFIX/drive_c/electrum
 cp electrum/LICENCE .
-cp -r electrum-locale/locale $WINEPREFIX/drive_c/electrum/lib/
-cp electrum-icons/icons_rc.py $WINEPREFIX/drive_c/electrum/gui/qt/
+cp -r ./electrum/contrib/deterministic-build/electrum-locale/locale $WINEPREFIX/drive_c/electrum/lib/
+cp ./electrum/contrib/deterministic-build/electrum-icons/icons_rc.py $WINEPREFIX/drive_c/electrum/gui/qt/
 
 # Install frozen dependencies
 $PYTHON -m pip install -r ../../deterministic-build/requirements.txt
@@ -69,7 +79,7 @@ cd ..
 rm -rf dist/
 
 # build standalone and portable versions
-wine "C:/python$PYTHON_VERSION/scripts/pyinstaller.exe" --noconfirm --ascii --name $NAME_ROOT-$VERSION -w deterministic.spec
+wine "C:/python$PYTHON_VERSION/scripts/pyinstaller.exe" --noconfirm --ascii --clean --name $NAME_ROOT-$VERSION -w deterministic.spec
 
 # set timestamps in dist, in order to make the installer reproducible
 pushd dist

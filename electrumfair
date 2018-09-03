@@ -64,13 +64,11 @@ def check_imports():
 if not is_android:
     check_imports()
 
-# load local module as electrum
+# load local module as electrumfair
 if is_local or is_android:
     import imp
     imp.load_module('electrumfair', *imp.find_module('lib'))
     imp.load_module('electrumfair_gui', *imp.find_module('gui'))
-    imp.load_module('electrumfair_plugins', *imp.find_module('plugins'))
-
 
 from electrumfair import bitcoin, util
 from electrumfair import constants
@@ -83,7 +81,6 @@ from electrumfair.commands import get_parser, known_commands, Commands, config_v
 from electrumfair import daemon
 from electrumfair import keystore
 from electrumfair.mnemonic import Mnemonic
-import electrumfair_plugins
 
 
 # get password routine
@@ -403,6 +400,8 @@ if __name__ == '__main__':
         constants.set_testnet()
     elif config.get('regtest'):
         constants.set_regtest()
+    elif config.get('simnet'):
+        constants.set_simnet()
 
     # run non-RPC commands separately
     if cmdname in ['create', 'restore']:

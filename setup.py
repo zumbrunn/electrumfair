@@ -40,13 +40,19 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
         (os.path.join(usr_share, icons_dirname), ['icons/electrumfair.png'])
     ]
 
+extras_require = {
+    'hardware': requirements_hw,
+    'fast': ['pycryptodomex'],
+    ':python_version < "3.5"': ['typing>=3.0.0'],
+}
+extras_require['full'] = extras_require['hardware'] + extras_require['fast']
+
+
 setup(
     name="ElectrumFair",
     version=version.ELECTRUMFAIR_VERSION,
     install_requires=requirements,
-    extras_require={
-        'full': requirements_hw + ['pycryptodomex'],
-    },
+    extras_require=extras_require,
     packages=[
         'electrumfair',
         'electrumfair_gui',
@@ -60,6 +66,7 @@ setup(
         'electrumfair_plugins.keepkey',
         'electrumfair_plugins.labels',
         'electrumfair_plugins.ledger',
+        'electrumfair_plugins.revealer',
         'electrumfair_plugins.trezor',
         'electrumfair_plugins.digitalbitbox',
         'electrumfair_plugins.trustedcoin',
@@ -71,17 +78,11 @@ setup(
         'electrumfair_plugins': 'plugins',
     },
     package_data={
+        '': ['*.txt', '*.json', '*.ttf', '*.otf'],
         'electrumfair': [
-            'servers.json',
-            'servers_testnet.json',
-            'servers_regtest.json',
-            'currencies.json',
-            'checkpoints.json',
-            'checkpoints_testnet.json',
-            'www/index.html',
             'wordlist/*.txt',
-            'locale/*/LC_MESSAGES/electrumfair.mo',
-        ]
+            'locale/*/LC_MESSAGES/electrum.mo',
+        ],
     },
     scripts=['electrumfair'],
     data_files=data_files,

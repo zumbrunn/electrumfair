@@ -9,8 +9,8 @@ import base64
 
 import electrumfair
 from electrumfair.plugins import BasePlugin, hook
+from electrumfair.crypto import aes_encrypt_with_iv, aes_decrypt_with_iv
 from electrumfair.i18n import _
-
 
 class LabelsPlugin(BasePlugin):
 
@@ -21,14 +21,13 @@ class LabelsPlugin(BasePlugin):
 
     def encode(self, wallet, msg):
         password, iv, wallet_id = self.wallets[wallet]
-        encrypted = electrumfair.bitcoin.aes_encrypt_with_iv(password, iv,
-                                                         msg.encode('utf8'))
+        encrypted = aes_encrypt_with_iv(password, iv, msg.encode('utf8'))
         return base64.b64encode(encrypted).decode()
 
     def decode(self, wallet, message):
         password, iv, wallet_id = self.wallets[wallet]
         decoded = base64.b64decode(message)
-        decrypted = electrumfair.bitcoin.aes_decrypt_with_iv(password, iv, decoded)
+        decrypted = aes_decrypt_with_iv(password, iv, decoded)
         return decrypted.decode('utf8')
 
     def get_nonce(self, wallet):

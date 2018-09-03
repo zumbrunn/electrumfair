@@ -50,7 +50,7 @@ class Plugins(DaemonThread):
             find = imp.find_module('plugins')
             plugins = imp.load_module('electrumfair_plugins', *find)
         else:
-            plugins = __import__('electrumfair_plugins')
+            import electrumfair_plugins as plugins
         self.pkgpath = os.path.dirname(plugins.__file__)
         self.config = config
         self.hw_wallets = {}
