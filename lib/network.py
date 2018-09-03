@@ -783,7 +783,7 @@ class Network(util.DaemonThread):
         with self.interface_lock:
             self.interfaces[server] = interface
         # server.version should be the first message
-        params = [ELECTRUM_VERSION, PROTOCOL_VERSION]
+        params = [ELECTRUMFAIR_VERSION, PROTOCOL_VERSION]
         self.queue_request('server.version', params, interface)
         self.queue_request('blockchain.headers.subscribe', [True], interface)
         if server == self.default_server:

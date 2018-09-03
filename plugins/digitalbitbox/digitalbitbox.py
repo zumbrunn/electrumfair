@@ -6,8 +6,7 @@
 try:
     import electrumfair
     from electrumfair.crypto import Hash, EncodeAES, DecodeAES
-    from electrumfair.bitcoin import TYPE_ADDRESS, push_script, var_int, public_key_to_p2pkh, is_address,
-                                  serialize_xpub, deserialize_xpub)
+    from electrumfair.bitcoin import TYPE_ADDRESS, push_script, var_int, public_key_to_p2pkh, is_address, serialize_xpub, deserialize_xpub
     from electrumfair import ecc
     from electrumfair.ecc import msg_magic
     from electrumfair.wallet import Standard_Wallet

@@ -568,7 +568,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                               "recovered from a secret phrase that you can memorize or write on paper.") + " " +
                            _("Startup times are instant because it operates in conjunction with high-performance "
                               "servers that handle the most complicated parts of the Faircoin system.") + "\n\n" +
-                           _("Uses icons from the Icons8 icon pack (icons8.com).")))
+                           _("Uses icons from the Icons8 icon pack (icons8.com)."))
 
     def show_report_bug(self):
         msg = ' '.join([

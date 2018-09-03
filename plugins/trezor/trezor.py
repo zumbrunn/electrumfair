@@ -2,26 +2,14 @@ from binascii import hexlify, unhexlify
 import traceback
 import sys
 
-<<<<<<< HEAD
-from electrumfair.util import bfh, bh2u, versiontuple
-from electrumfair.bitcoin import (b58_address_to_hash160, xpub_from_pubkey,
-                              TYPE_ADDRESS, TYPE_SCRIPT)
+from electrumfair.util import bfh, bh2u, versiontuple, UserCancelled
+from electrumfair.bitcoin import (b58_address_to_hash160, xpub_from_pubkey, deserialize_xpub,
+                              TYPE_ADDRESS, TYPE_SCRIPT, is_address)
 from electrumfair import constants
 from electrumfair.i18n import _
 from electrumfair.plugins import BasePlugin, Device
 from electrumfair.transaction import deserialize, Transaction
-from electrumfair.keystore import Hardware_KeyStore, is_xpubkey, parse_xpubkey
-=======
-from electrum.util import bfh, bh2u, versiontuple, UserCancelled
-from electrum.bitcoin import (b58_address_to_hash160, xpub_from_pubkey, deserialize_xpub,
-                              TYPE_ADDRESS, TYPE_SCRIPT, is_address)
-from electrum import constants
-from electrum.i18n import _
-from electrum.plugins import BasePlugin, Device
-from electrum.transaction import deserialize, Transaction
-from electrum.keystore import Hardware_KeyStore, is_xpubkey, parse_xpubkey, xtype_from_derivation
-from electrum.base_wizard import ScriptTypeNotSupported
->>>>>>> 3.2.2
+from electrumfair.keystore import Hardware_KeyStore, is_xpubkey, parse_xpubkey, xtype_from_derivation
 
 from ..hw_wallet import HW_PluginBase
 from ..hw_wallet.plugin import is_any_tx_output_on_change_branch
