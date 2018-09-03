@@ -28,11 +28,11 @@ import sys
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 is_bundle = getattr(sys, 'frozen', False)
-is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum.desktop"))
+is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrumfair.desktop"))
 is_android = 'ANDROID_DATA' in os.environ
 
 # move this back to gui/kivy/__init.py once plugins are moved
-os.environ['KIVY_DATA_DIR'] = os.path.abspath(os.path.dirname(__file__)) + '/electrum/gui/kivy/data/'
+os.environ['KIVY_DATA_DIR'] = os.path.abspath(os.path.dirname(__file__)) + '/gui/kivy/data/'
 
 if is_local or is_android:
     sys.path.insert(0, os.path.join(script_dir, 'packages'))
@@ -46,6 +46,7 @@ def check_imports():
         import ecdsa
         import requests
         import qrcode
+        import pbkdf2
         import google.protobuf
         import jsonrpclib
     except ImportError as e:
@@ -63,19 +64,24 @@ def check_imports():
 if not is_android:
     check_imports()
 
+# load local module as electrumfair
+if is_local or is_android:
+    import imp
+    imp.load_module('electrumfair', *imp.find_module('lib'))
+    imp.load_module('electrumfair_gui', *imp.find_module('gui'))
 
-from electrum import bitcoin, util
-from electrum import constants
-from electrum import SimpleConfig, Network
-from electrum.wallet import Wallet, Imported_Wallet
-from electrum import bitcoin, util, constants
-from electrum.storage import WalletStorage, get_derivation_used_for_hw_device_encryption
-from electrum.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
-from electrum.util import set_verbosity, InvalidPassword
-from electrum.commands import get_parser, known_commands, Commands, config_variables
-from electrum import daemon
-from electrum import keystore
-from electrum.mnemonic import Mnemonic
+from electrumfair import bitcoin, util
+from electrumfair import constants
+from electrumfair import SimpleConfig, Network
+from electrumfair.wallet import Wallet, Imported_Wallet
+from electrumfair.storage import WalletStorage, get_derivation_used_for_hw_device_encryption
+from electrumfair.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
+from electrumfair.util import set_verbosity, InvalidPassword
+from electrumfair.commands import get_parser, known_commands, Commands, config_variables
+from electrumfair import daemon
+from electrumfair import keystore
+from electrumfair.mnemonic import Mnemonic
+
 
 # get password routine
 def prompt_password(prompt, confirm=True):
@@ -169,7 +175,7 @@ def init_daemon(config_options):
     storage = WalletStorage(config.get_wallet_path())
     if not storage.file_exists():
         print_msg("Error: Wallet file not found.")
-        print_msg("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print_msg("Type 'electrumfair create' to create a new wallet, or provide a path to a wallet with the -w option")
         sys.exit(0)
     if storage.is_encrypted():
         if storage.is_encrypted_with_hw_device():
@@ -207,7 +213,7 @@ def init_cmdline(config_options, server):
 
     if cmd.requires_wallet and not storage.file_exists():
         print_msg("Error: Wallet file not found.")
-        print_msg("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print_msg("Type 'electrumfair create' to create a new wallet, or provide a path to a wallet with the -w option")
         sys.exit(0)
 
     # important warning
@@ -320,7 +326,7 @@ def run_offline_command(config, config_options, plugins):
     return result
 
 def init_plugins(config, gui_name):
-    from electrum.plugin import Plugins
+    from electrumfair.plugins import Plugins
     return Plugins(config, is_local or is_android, gui_name)
 
 
@@ -334,14 +340,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'help':
         sys.argv.remove('help')
         sys.argv.append('-h')
-
-    # old '-v' syntax
-    try:
-        i = sys.argv.index('-v')
-    except ValueError:
-        pass
-    else:
-        sys.argv[i] = '-v*'
 
     # read arguments from stdin pipe and prompt
     for i, arg in enumerate(sys.argv):
@@ -363,7 +361,7 @@ if __name__ == '__main__':
     # config is an object passed to the various constructors (wallet, interface, gui)
     if is_android:
         config_options = {
-            'verbosity': '',
+            'verbose': True,
             'cmd': 'gui',
             'gui': 'kivy',
         }
@@ -381,15 +379,15 @@ if __name__ == '__main__':
         config_options['portable'] = True
 
     if config_options.get('portable'):
-        config_options['electrum_path'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'electrum_data')
+        config_options['electrumfair_path'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'electrumfair_data')
 
     # kivy sometimes freezes when we write to sys.stderr
-    set_verbosity(config_options.get('verbosity') if config_options.get('gui') != 'kivy' else '')
+    set_verbosity(config_options.get('verbose') and config_options.get('gui')!='kivy')
 
     # check uri
     uri = config_options.get('url')
     if uri:
-        if not uri.startswith('bitcoin:'):
+        if not uri.startswith('faircoin:'):
             print_stderr('unknown command:', uri)
             sys.exit(1)
         config_options['url'] = uri
@@ -438,7 +436,7 @@ if __name__ == '__main__':
                 d = daemon.Daemon(config, fd, False)
                 d.start()
                 if config.get('websocket_server'):
-                    from electrum import websockets
+                    from electrumfair import websockets
                     websockets.WebSocketServer(config, d.network).start()
                 if config.get('requests_dir'):
                     path = os.path.join(config.get('requests_dir'), 'index.html')
@@ -466,11 +464,11 @@ if __name__ == '__main__':
         else:
             cmd = known_commands[cmdname]
             if cmd.requires_network:
-                print_msg("Daemon not running; try 'electrum daemon start'")
+                print_msg("Daemon not running; try 'electrumfair daemon start'")
                 sys.exit(1)
             else:
-                plugins = init_plugins(config, 'cmdline')
-                result = run_offline_command(config, config_options, plugins)
+                init_plugins(config, 'cmdline')
+                result = run_offline_command(config, config_options)
                 # print result
     if isinstance(result, str):
         print_msg(result)
