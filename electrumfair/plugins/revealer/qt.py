@@ -26,11 +26,11 @@ import binascii
 
 from PyQt5.QtPrintSupport import QPrinter
 
-from electrum.plugin import BasePlugin, hook
-from electrum.i18n import _
-from electrum.util import to_bytes, make_dir
-from electrum.gui.qt.util import *
-from electrum.gui.qt.qrtextedit import ScanQRTextEdit
+from electrumfair.plugin import BasePlugin, hook
+from electrumfair.i18n import _
+from electrumfair.util import to_bytes, make_dir
+from electrumfair.gui.qt.util import *
+from electrumfair.gui.qt.qrtextedit import ScanQRTextEdit
 
 from .hmac_drbg import DRBG
 
@@ -38,7 +38,7 @@ class Plugin(BasePlugin):
 
     def __init__(self, parent, config, name):
         BasePlugin.__init__(self, parent, config, name)
-        self.base_dir = config.electrum_path()+'/revealer/'
+        self.base_dir = config.electrumfair_path()+'/revealer/'
 
         if self.config.get('calibration_h') is None:
             self.config.set_key('calibration_h', 0)

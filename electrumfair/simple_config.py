@@ -66,7 +66,6 @@ class SimpleConfig(PrintError):
         self.fee_estimates = {}
         self.fee_estimates_last_updated = {}
         self.last_time_fee_estimates_requested = 0  # zero ensures immediate fees
-        self.transaction_fee = 2000000 # let's have a reasonable start value
 
         # The following two functions are there for dependency injection when
         # testing.
@@ -83,8 +82,8 @@ class SimpleConfig(PrintError):
         self.cmdline_options.pop('config_version', None)
 
         # Set self.path and read the user config
-        self.user_config = {}  # for self.get in electrum_path()
-        self.path = self.electrum_path()
+        self.user_config = {}  # for self.get in electrumfair_path()
+        self.path = self.electrumfair_path()
         self.user_config = read_user_config_function(self.path)
         if not self.user_config:
             # avoid new config getting upgraded
@@ -101,10 +100,10 @@ class SimpleConfig(PrintError):
         # Make a singleton instance of 'self'
         set_config(self)
 
-    def electrum_path(self):
-        # Read electrum_path from command line
+    def electrumfair_path(self):
+        # Read electrumfair_path from command line
         # Otherwise use the user's default data directory.
-        path = self.get('electrum_path')
+        path = self.get('electrumfair_path')
         if path is None:
             path = self.user_dir()
 
@@ -119,7 +118,7 @@ class SimpleConfig(PrintError):
             path = os.path.join(path, 'simnet')
             make_dir(path, allow_symlink=False)
 
-        self.print_error("electrum directory", path)
+        #self.print_error("electrumfair directory", path)
         return path
 
     def rename_config_keys(self, config, keypairs, deprecation_warning=False):
@@ -196,7 +195,7 @@ class SimpleConfig(PrintError):
         base_unit = self.user_config.get('base_unit')
         if isinstance(base_unit, str):
             self._set_key_in_user_config('base_unit', None)
-            map_ = {'btc':8, 'mbtc':5, 'ubtc':2, 'bits':2, 'sat':0}
+            map_ = {'FAIR':8, 'mFAIR':5, 'uFAIR':2, 'bits':2, 'sat':0}
             decimal_point = map_.get(base_unit.lower())
             self._set_key_in_user_config('decimal_point', decimal_point)
 
@@ -257,7 +256,7 @@ class SimpleConfig(PrintError):
         new_path = os.path.join(self.path, "wallets", "default_wallet")
 
         # default path in pre 1.9 versions
-        old_path = os.path.join(self.path, "electrum.dat")
+        old_path = os.path.join(self.path, "electrumfair.dat")
         if os.path.exists(old_path) and not os.path.exists(new_path):
             os.rename(old_path, new_path)
 

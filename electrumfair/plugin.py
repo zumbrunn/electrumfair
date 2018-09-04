@@ -60,7 +60,7 @@ class Plugins(DaemonThread):
 
     def load_plugins(self):
         for loader, name, ispkg in pkgutil.iter_modules([self.pkgpath]):
-            mod = pkgutil.find_loader('electrum.plugins.' + name)
+            mod = pkgutil.find_loader('electrumfair.plugins.' + name)
             m = mod.load_module()
             d = m.__dict__
             gui_good = self.gui_name in d.get('available_for', [])
@@ -153,7 +153,7 @@ class Plugins(DaemonThread):
 
     def register_wallet_type(self, name, gui_good, wallet_type):
         from .wallet import register_wallet_type, register_constructor
-        self.print_error("registering wallet type", (wallet_type, name))
+        #self.print_error("registering wallet type", (wallet_type, name))
         def loader():
             plugin = self.get_plugin(name)
             register_constructor(wallet_type, plugin.wallet_class)

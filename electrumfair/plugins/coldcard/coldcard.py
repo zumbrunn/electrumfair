@@ -7,20 +7,20 @@ import hashlib
 import os, sys, time, io
 import traceback
 
-from electrum import bitcoin
-from electrum.bitcoin import serialize_xpub, deserialize_xpub, InvalidMasterKeyVersionBytes
-from electrum import constants
-from electrum.bitcoin import TYPE_ADDRESS, int_to_hex
-from electrum.i18n import _
-from electrum.plugin import BasePlugin, Device
-from electrum.keystore import Hardware_KeyStore, xpubkey_to_pubkey, Xpub
-from electrum.transaction import Transaction
-from electrum.wallet import Standard_Wallet
-from electrum.crypto import hash_160
+from electrumfair import bitcoin
+from electrumfair.bitcoin import serialize_xpub, deserialize_xpub, InvalidMasterKeyVersionBytes
+from electrumfair import constants
+from electrumfair.bitcoin import TYPE_ADDRESS, int_to_hex
+from electrumfair.i18n import _
+from electrumfair.plugin import BasePlugin, Device
+from electrumfair.keystore import Hardware_KeyStore, xpubkey_to_pubkey, Xpub
+from electrumfair.transaction import Transaction
+from electrumfair.wallet import Standard_Wallet
+from electrumfair.crypto import hash_160
 from ..hw_wallet import HW_PluginBase
 from ..hw_wallet.plugin import is_any_tx_output_on_change_branch
-from electrum.util import print_error, bfh, bh2u, versiontuple
-from electrum.base_wizard import ScriptTypeNotSupported
+from electrumfair.util import print_error, bfh, bh2u, versiontuple
+from electrumfair.base_wizard import ScriptTypeNotSupported
 
 try:
     import hid

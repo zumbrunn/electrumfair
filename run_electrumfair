@@ -320,7 +320,7 @@ def run_offline_command(config, config_options, plugins):
     return result
 
 def init_plugins(config, gui_name):
-    from electrumfair.plugins import Plugins
+    from electrumfair.plugin import Plugins
     return Plugins(config, is_local or is_android, gui_name)
 
 

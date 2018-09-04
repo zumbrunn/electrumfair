@@ -1484,21 +1484,12 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.show_error(_('No outputs'))
             return
 
-<<<<<<< HEAD:gui/qt/main_window.py
-        for _type, addr, amount in outputs:
-            if addr is None:
-                self.show_error(_('FairCoin Address is None'))
-                return
-            if _type == TYPE_ADDRESS and not bitcoin.is_address(addr):
-                self.show_error(_('Invalid FairCoin Address'))
-=======
         for o in outputs:
             if o.address is None:
-                self.show_error(_('Bitcoin Address is None'))
+                self.show_error(_('Faircoin Address is None'))
                 return
             if o.type == TYPE_ADDRESS and not bitcoin.is_address(o.address):
-                self.show_error(_('Invalid Bitcoin Address'))
->>>>>>> master:electrum/gui/qt/main_window.py
+                self.show_error(_('Invalid Faircoin Address'))
                 return
             if o.value is None:
                 self.show_error(_('Invalid Amount'))

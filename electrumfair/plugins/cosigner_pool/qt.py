@@ -36,7 +36,7 @@ from electrumfair.plugin import BasePlugin, hook
 from electrumfair.i18n import _
 from electrumfair.wallet import Multisig_Wallet
 from electrumfair.util import bh2u, bfh
-from electrumfair_gui.qt.transaction_dialog import show_transaction
+from electrumfair.gui.qt.transaction_dialog import show_transaction
 from electrumfair.gui.qt.util import WaitingDialog
 
 import sys

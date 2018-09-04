@@ -28,7 +28,7 @@ import os
 
 import requests
 
-from .version import ELECTRUM_VERSION
+from .version import ELECTRUMFAIR_VERSION
 from .import constants
 from .i18n import _
 
@@ -87,7 +87,7 @@ class BaseCrashReporter(object):
 
     def get_additional_info(self):
         args = {
-            "app_version": ELECTRUM_VERSION,
+            "app_version": ELECTRUMFAIR_VERSION,
             "python_version": sys.version,
             "os": self.get_os_version(),
             "wallet_type": "unknown",

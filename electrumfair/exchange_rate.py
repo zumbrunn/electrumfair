@@ -35,7 +35,7 @@ class ExchangeBase(PrintError):
     def get_json(self, site, get_string):
         # APIs must have https
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum'}, timeout=10)
+        response = requests.request('GET', url, headers={'User-Agent' : 'ElectrumFair'}, timeout=10)
         return response.json()
 
     def get_csv(self, site, get_string):
@@ -114,17 +114,23 @@ class ExchangeBase(PrintError):
         rates = self.get_rates('')
         return sorted([str(a) for (a, b) in rates.items() if b is not None and len(a)==3])
 
-
 class ChainFaircoin(ExchangeBase):
+
     def get_rates(self,ccy):
         json = self.get_json('chain.fair-coin.org', '/download/ticker')
         return dict([(r, Decimal(json[r]['last'])) for r in json])
 
+    def get_currencies(self):
+        return { "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" }
+
 class GetFaircoin(ExchangeBase):
+
     def get_rates(self,ccy):
         json = self.get_json('getfaircoin.net', '/api/ticker')
         return dict([(r, Decimal(json[r]['last'])) for r in json])
 
+    def get_currencies(self):
+        return { "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" }
 
 def dictinvert(d):
     inv = {}

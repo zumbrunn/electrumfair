@@ -7,7 +7,7 @@ import traceback
 
 import base64
 
-from electrumfair.plugin. import BasePlugin, hook
+from electrumfair.plugin import BasePlugin, hook
 from electrumfair.crypto import aes_encrypt_with_iv, aes_decrypt_with_iv
 from electrumfair.i18n import _
 

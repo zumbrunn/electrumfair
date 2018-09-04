@@ -5,11 +5,11 @@ from PyQt5.Qt import Qt
 from PyQt5.Qt import QGridLayout, QInputDialog, QPushButton
 from PyQt5.Qt import QVBoxLayout, QLabel
 
-from electrum.gui.qt.util import *
-from electrum.i18n import _
-from electrum.plugin import hook, DeviceMgr
-from electrum.util import PrintError, UserCancelled, bh2u
-from electrum.wallet import Wallet, Standard_Wallet
+from electrumfair.gui.qt.util import *
+from electrumfair.i18n import _
+from electrumfair.plugin import hook, DeviceMgr
+from electrumfair.util import PrintError, UserCancelled, bh2u
+from electrumfair.wallet import Wallet, Standard_Wallet
 
 from ..hw_wallet.qt import QtHandlerBase, QtPluginBase
 from .trezor import (TrezorPlugin, TIM_NEW, TIM_RECOVER, TIM_MNEMONIC,
@@ -20,16 +20,16 @@ PASSPHRASE_HELP_SHORT =_(
     "Passphrases allow you to access new wallets, each "
     "hidden behind a particular case-sensitive passphrase.")
 PASSPHRASE_HELP = PASSPHRASE_HELP_SHORT + "  " + _(
-    "You need to create a separate Electrum wallet for each passphrase "
+    "You need to create a separate Electrumfair wallet for each passphrase "
     "you use as they each generate different addresses.  Changing "
     "your passphrase does not lose other wallets, each is still "
     "accessible behind its own passphrase.")
 RECOMMEND_PIN = _(
     "You should enable PIN protection.  Your PIN is the only protection "
-    "for your bitcoins if your device is lost or stolen.")
+    "for your faircoins if your device is lost or stolen.")
 PASSPHRASE_NOT_PIN = _(
     "If you forget a passphrase you will be unable to access any "
-    "bitcoins in the wallet behind it.  A passphrase is not a PIN. "
+    "faircoins in the wallet behind it.  A passphrase is not a PIN. "
     "Only change this if you are sure you understand it.")
 MATRIX_RECOVERY = _(
     "Enter the recovery words by pressing the buttons according to what "
@@ -220,7 +220,7 @@ class QtPlugin(QtPluginBase):
             else:
                 msg = _("Enter the master private key beginning with xprv:")
                 def set_enabled():
-                    from electrum.keystore import is_xprv
+                    from electrumfair.keystore import is_xprv
                     wizard.next_button.setEnabled(is_xprv(clean_text(text)))
                 text.textChanged.connect(set_enabled)
                 next_enabled = False
@@ -372,13 +372,13 @@ class SettingsDialog(WindowModalDialog):
             currently_enabled = self.features.passphrase_protection
             if currently_enabled:
                 msg = _("After disabling passphrases, you can only pair this "
-                        "Electrum wallet if it had an empty passphrase.  "
+                        "Electrumfair wallet if it had an empty passphrase.  "
                         "If its passphrase was not empty, you will need to "
                         "create a new wallet with the install wizard.  You "
                         "can use this wallet again at any time by re-enabling "
                         "passphrases and entering its passphrase.")
             else:
-                msg = _("Your current Electrum wallet can only be used with "
+                msg = _("Your current Electrumfair wallet can only be used with "
                         "an empty passphrase.  You must create a separate "
                         "wallet with the install wizard for other passphrases "
                         "as each one generates a new set of addresses.")

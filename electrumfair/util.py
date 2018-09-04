@@ -44,6 +44,7 @@ import queue
 def inv_dict(d):
     return {v: k for k, v in d.items()}
 
+
 base_units = {'FAIR':8, 'mFAIR':5, 'uFAIR':2, 'sat':0}
 base_units_inverse = inv_dict(base_units)
 base_units_list = ['FAIR', 'mFAIR', 'uFair', 'sat']  # list(dict) does not guarantee order
@@ -176,8 +177,8 @@ class PrintError(object):
         return self.__class__.__name__
 
     def print_error(self, *msg):
-        if self.verbosity_filter in verbosity or verbosity == '*':
-            print_error("[%s]" % self.diagnostic_name(), *msg)
+        #if self.verbosity_filter in verbosity or verbosity == '*': #error TypeError: argument of type 'NoneType' is not iterable
+        print_error("[%s]" % self.diagnostic_name(), *msg)
 
     def print_stderr(self, *msg):
         print_stderr("[%s]" % self.diagnostic_name(), *msg)
