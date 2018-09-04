@@ -64,12 +64,6 @@ def check_imports():
 if not is_android:
     check_imports()
 
-# load local module as electrumfair
-if is_local or is_android:
-    import imp
-    imp.load_module('electrumfair', *imp.find_module('lib'))
-    imp.load_module('electrumfair_gui', *imp.find_module('gui'))
-
 from electrumfair import bitcoin, util
 from electrumfair import constants
 from electrumfair import SimpleConfig, Network
@@ -340,6 +334,14 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'help':
         sys.argv.remove('help')
         sys.argv.append('-h')
+
+    # old '-v' syntax
+    try:
+        i = sys.argv.index('-v')
+    except ValueError:
+        pass
+    else:
+        sys.argv[i] = '-v*'
 
     # read arguments from stdin pipe and prompt
     for i, arg in enumerate(sys.argv):

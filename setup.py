@@ -61,7 +61,7 @@ class CustomInstallCommand(install):
             pass
         else:
             try:
-                path = os.path.join(self.install_lib, "electrum/gui/qt/icons_rc.py")
+                path = os.path.join(self.install_lib, "electrumfair/gui/qt/icons_rc.py")
                 if not os.path.exists(path):
                     subprocess.call(["pyrcc5", "icons.qrc", "-o", path])
             except Exception as e:
@@ -86,7 +86,7 @@ setup(
         '': ['*.txt', '*.json', '*.ttf', '*.otf'],
         'electrumfair': [
             'wordlist/*.txt',
-            'locale/*/LC_MESSAGES/electrum.mo',
+            'locale/*/LC_MESSAGES/electrumfair.mo',
         ],
     },
     scripts=['electrumfair/electrumfair'],
@@ -96,7 +96,7 @@ setup(
     author_email="thomasv@electrum.org, tom@fair-coin.org",
     license="MIT Licence",
     url="https://download.faircoin.world",
-    long_description="""Lightweight FairCoin Wallet"""
+    long_description="""Lightweight FairCoin Wallet""",
     cmdclass={
         'install': CustomInstallCommand,
     },
