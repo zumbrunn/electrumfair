@@ -122,11 +122,9 @@ class ChainFaircoin(ExchangeBase):
         return dict([(r, Decimal(json[r]['last'])) 
                      for r in json])
 
-    def get_currencies(self):
+    def history_ccys(self):
         return [ "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" ]
 
-    def history_ccys(self):
-        return self.get_currencies()
 
 class GetFaircoin(ExchangeBase):
 
@@ -135,11 +133,9 @@ class GetFaircoin(ExchangeBase):
         return dict([(r, Decimal(json[r]['last'])) 
                      for r in json])
 
-    def get_currencies(self):
+    def history_ccys(self):
         return [ "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" ]
 
-    def history_ccys(self):
-        return self.get_currencies()
 
 def dictinvert(d):
     inv = {}
@@ -186,7 +182,7 @@ def get_exchanges_by_ccy(history=True):
     for name in exchanges:
         klass = globals()[name]
         exchange = klass(None, None)
-        d[name] = exchange.get_currencies()
+        d[name] = exchange.history_ccys()
     return dictinvert(d)
 
 
@@ -230,11 +226,9 @@ class FxThread(ThreadJob):
                 self.exchange.update(self.ccy)
 
     def is_enabled(self):
-        #return bool(self.config.get('use_exchange_rate'))
-        return True
+        return bool(self.config.get('use_exchange_rate'))
 
     def set_enabled(self, b):
-        b = True 
         return self.config.set_key('use_exchange_rate', bool(b))
 
     def get_history_config(self):
