@@ -114,33 +114,6 @@ class ExchangeBase(PrintError):
         rates = self.get_rates('')
         return sorted([str(a) for (a, b) in rates.items() if b is not None and len(a)==3])
 
-class BitcoinAverage(ExchangeBase):
-
-    def get_rates(self, ccy):
-        json = self.get_json('apiv2.bitcoinaverage.com', '/indices/global/ticker/short')
-        return dict([(r.replace("BTC", ""), Decimal(json[r]['last']))
-                     for r in json if r != 'timestamp'])
-
-    def history_ccys(self):
-        return ['AUD', 'BRL', 'CAD', 'CHF', 'CNY', 'EUR', 'GBP', 'IDR', 'ILS',
-                'MXN', 'NOK', 'NZD', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'USD',
-                'ZAR']
-
-    def request_history(self, ccy):
-        history = self.get_csv('apiv2.bitcoinaverage.com',
-                               "/indices/global/history/BTC%s?period=alltime&format=csv" % ccy)
-        return dict([(h['DateTime'][:10], h['Average'])
-                     for h in history])
-
-
-class Coinbase(ExchangeBase):
-
-    def get_rates(self, ccy):
-        json = self.get_json('coinbase.com',
-                             '/api/v1/currencies/exchange_rates')
-        return dict([(r[7:].upper(), Decimal(json[r]))
-                     for r in json if r.startswith('btc_to_')])
-
 
 class ChainFaircoin(ExchangeBase):
 
@@ -152,8 +125,8 @@ class ChainFaircoin(ExchangeBase):
     def get_currencies(self):
         return [ "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" ]
 
-    #def history_ccys(self):
-    #    return self.get_currencies()
+    def history_ccys(self):
+        return self.get_currencies()
 
 class GetFaircoin(ExchangeBase):
 
@@ -165,8 +138,8 @@ class GetFaircoin(ExchangeBase):
     def get_currencies(self):
         return [ "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" ]
 
-    #def history_ccys(self):
-    #    return self.get_currencies()
+    def history_ccys(self):
+        return self.get_currencies()
 
 def dictinvert(d):
     inv = {}
@@ -299,7 +272,7 @@ class FxThread(ThreadJob):
         self.on_quotes()
 
     def set_exchange(self, name):
-        class_ = globals().get(name, BitcoinAverage)
+        class_ = globals().get(name, ChainFaircoin)
         self.print_error("using exchange", name)
         if self.config_exchange() != name:
             self.config.set_key('use_exchange', name, True)
