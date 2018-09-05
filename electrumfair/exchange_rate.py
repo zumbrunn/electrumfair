@@ -35,12 +35,12 @@ class ExchangeBase(PrintError):
     def get_json(self, site, get_string):
         # APIs must have https
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'ElectrumFair'}, timeout=10)
+        response = requests.request('GET', url, headers={'User-Agent' : 'Electrumfair'}, timeout=10)
         return response.json()
 
     def get_csv(self, site, get_string):
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum'})
+        response = requests.request('GET', url, headers={'User-Agent' : 'Electrumfair'})
         reader = csv.DictReader(response.content.decode().split('\n'))
         return list(reader)
 
@@ -114,23 +114,59 @@ class ExchangeBase(PrintError):
         rates = self.get_rates('')
         return sorted([str(a) for (a, b) in rates.items() if b is not None and len(a)==3])
 
+class BitcoinAverage(ExchangeBase):
+
+    def get_rates(self, ccy):
+        json = self.get_json('apiv2.bitcoinaverage.com', '/indices/global/ticker/short')
+        return dict([(r.replace("BTC", ""), Decimal(json[r]['last']))
+                     for r in json if r != 'timestamp'])
+
+    def history_ccys(self):
+        return ['AUD', 'BRL', 'CAD', 'CHF', 'CNY', 'EUR', 'GBP', 'IDR', 'ILS',
+                'MXN', 'NOK', 'NZD', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'USD',
+                'ZAR']
+
+    def request_history(self, ccy):
+        history = self.get_csv('apiv2.bitcoinaverage.com',
+                               "/indices/global/history/BTC%s?period=alltime&format=csv" % ccy)
+        return dict([(h['DateTime'][:10], h['Average'])
+                     for h in history])
+
+
+class Coinbase(ExchangeBase):
+
+    def get_rates(self, ccy):
+        json = self.get_json('coinbase.com',
+                             '/api/v1/currencies/exchange_rates')
+        return dict([(r[7:].upper(), Decimal(json[r]))
+                     for r in json if r.startswith('btc_to_')])
+
+
 class ChainFaircoin(ExchangeBase):
 
     def get_rates(self,ccy):
         json = self.get_json('chain.fair-coin.org', '/download/ticker')
-        return dict([(r, Decimal(json[r]['last'])) for r in json])
+        return dict([(r, Decimal(json[r]['last'])) 
+                     for r in json])
 
     def get_currencies(self):
-        return { "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" }
+        return [ "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" ]
+
+    #def history_ccys(self):
+    #    return self.get_currencies()
 
 class GetFaircoin(ExchangeBase):
 
     def get_rates(self,ccy):
         json = self.get_json('getfaircoin.net', '/api/ticker')
-        return dict([(r, Decimal(json[r]['last'])) for r in json])
+        return dict([(r, Decimal(json[r]['last'])) 
+                     for r in json])
 
     def get_currencies(self):
-        return { "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" }
+        return [ "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" ]
+
+    #def history_ccys(self):
+    #    return self.get_currencies()
 
 def dictinvert(d):
     inv = {}
@@ -177,7 +213,7 @@ def get_exchanges_by_ccy(history=True):
     for name in exchanges:
         klass = globals()[name]
         exchange = klass(None, None)
-        d[name] = exchange.history_ccys()
+        d[name] = exchange.get_currencies()
     return dictinvert(d)
 
 
@@ -221,9 +257,11 @@ class FxThread(ThreadJob):
                 self.exchange.update(self.ccy)
 
     def is_enabled(self):
-        return bool(self.config.get('use_exchange_rate'))
+        #return bool(self.config.get('use_exchange_rate'))
+        return True
 
     def set_enabled(self, b):
+        b = True 
         return self.config.set_key('use_exchange_rate', bool(b))
 
     def get_history_config(self):
@@ -261,7 +299,7 @@ class FxThread(ThreadJob):
         self.on_quotes()
 
     def set_exchange(self, name):
-        class_ = globals().get(name, ChainFaircoin)
+        class_ = globals().get(name, BitcoinAverage)
         self.print_error("using exchange", name)
         if self.config_exchange() != name:
             self.config.set_key('use_exchange', name, True)
