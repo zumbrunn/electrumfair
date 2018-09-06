@@ -26,12 +26,7 @@ release:
 	@make clean
 clean:
 	# Cleaning up
-<<<<<<< HEAD:gui/kivy/Makefile
 	# rename main.py to electrumfair
-	@-rm ../../main.py
-=======
-	# rename main.py to electrum
 	@-rm ../../../main.py
->>>>>>> master:electrumfair/gui/kivy/Makefile
 	# remove buildozer.spec
 	@-rm ../../../buildozer.spec
