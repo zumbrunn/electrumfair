@@ -127,7 +127,7 @@ android.manifest.launch_mode = singleTask
 android.whitelist = lib-dynload/_csv.so
 
 # local version that merges branch 866
-p4a.source_dir = /usr/local/lib/python3.5/dist-packages/pythonforandroid/ # Debian stretch
+p4a.source_dir = /opt/python-for-android
 
 #
 # iOS specific
