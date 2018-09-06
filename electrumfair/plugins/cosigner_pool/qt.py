@@ -42,7 +42,7 @@ from electrumfair.gui.qt.util import WaitingDialog
 import sys
 import traceback
 
-server = ServerProxy('cosigner-pool.faircoin.world', allow_none=True)
+server = ServerProxy('https://cosigner-pool.faircoin.world', allow_none=True)
 
 class Listener(util.DaemonThread):
 

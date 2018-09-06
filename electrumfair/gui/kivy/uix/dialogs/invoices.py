@@ -79,7 +79,7 @@ from kivy.properties import BooleanProperty
 from electrumfair.gui.kivy.i18n import _
 from electrumfair.util import format_time
 from electrumfair.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
-from electrumfair_gui.kivy.uix.context_menu import ContextMenu
+from electrumfair.gui.kivy.uix.context_menu import ContextMenu
 
 invoice_text = {
     PR_UNPAID:_('Pending'),
@@ -88,10 +88,10 @@ invoice_text = {
     PR_EXPIRED:_('Expired')
 }
 pr_icon = {
-    PR_UNPAID: 'atlas://electrum/gui/kivy/theming/light/important',
-    PR_UNKNOWN: 'atlas://electrum/gui/kivy/theming/light/important',
-    PR_PAID: 'atlas://electrum/gui/kivy/theming/light/confirmed',
-    PR_EXPIRED: 'atlas://electrum/gui/kivy/theming/light/close'
+    PR_UNPAID: 'atlas://electrumfair/gui/kivy/theming/light/important',
+    PR_UNKNOWN: 'atlas://electrumfair/gui/kivy/theming/light/important',
+    PR_PAID: 'atlas://electrumfair/gui/kivy/theming/light/confirmed',
+    PR_EXPIRED: 'atlas://electrumfair/gui/kivy/theming/light/close'
 }
 
 
