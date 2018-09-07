@@ -30,10 +30,10 @@ from kivy.metrics import inch
 from kivy.lang import Builder
 
 ## lazy imports for factory so that widgets can be used in kv
-#Factory.register('InstallWizard', module='electrum.gui.kivy.uix.dialogs.installwizard')
-#Factory.register('InfoBubble', module='electrum.gui.kivy.uix.dialogs')
-#Factory.register('OutputList', module='electrum.gui.kivy.uix.dialogs')
-#Factory.register('OutputItem', module='electrum.gui.kivy.uix.dialogs')
+#Factory.register('InstallWizard', module='electrumfair.gui.kivy.uix.dialogs.installwizard')
+#Factory.register('InfoBubble', module='electrumfair.gui.kivy.uix.dialogs')
+#Factory.register('OutputList', module='electrumfair.gui.kivy.uix.dialogs')
+#Factory.register('OutputItem', module='electrumfair.gui.kivy.uix.dialogs')
 
 from .uix.dialogs.installwizard import InstallWizard
 from .uix.dialogs import InfoBubble, crash_reporter
@@ -49,7 +49,7 @@ util = False
 
 # register widget cache for keeping memory down timeout to forever to cache
 # the data
-Cache.register('electrum_widgets', timeout=0)
+Cache.register('electrumfair_widgets', timeout=0)
 
 from kivy.uix.screenmanager import Screen
 from kivy.uix.tabbedpanel import TabbedPanel
@@ -63,19 +63,19 @@ Factory.register('TabbedCarousel', module='electrumfair.gui.kivy.uix.screens')
 # inside markup.
 from kivy.core.text import Label
 Label.register('Roboto',
-               'electrum/gui/kivy/data/fonts/Roboto.ttf',
-               'electrum/gui/kivy/data/fonts/Roboto.ttf',
-               'electrum/gui/kivy/data/fonts/Roboto-Bold.ttf',
-               'electrum/gui/kivy/data/fonts/Roboto-Bold.ttf')
+               'electrumfair/gui/kivy/data/fonts/Roboto.ttf',
+               'electrumfair/gui/kivy/data/fonts/Roboto.ttf',
+               'electrumfair/gui/kivy/data/fonts/Roboto-Bold.ttf',
+               'electrumfair/gui/kivy/data/fonts/Roboto-Bold.ttf')
 
 
 from electrumfair.util import (base_units, NoDynamicFeeEstimates, decimal_point_to_base_unit_name,
                            base_unit_name_to_decimal_point, NotEnoughFunds)
 
 
-class ElectrumWindow(App):
+class ElectrumFairWindow(App):
 
-    electrum_config = ObjectProperty(None)
+    electrumfair_config = ObjectProperty(None)
     language = StringProperty('en')
 
     # properties might be updated by the network
@@ -124,15 +124,15 @@ class ElectrumWindow(App):
 
     use_rbf = BooleanProperty(False)
     def on_use_rbf(self, instance, x):
-        self.electrum_config.set_key('use_rbf', self.use_rbf, True)
+        self.electrumfair_config.set_key('use_rbf', self.use_rbf, True)
 
     use_change = BooleanProperty(False)
     def on_use_change(self, instance, x):
-        self.electrum_config.set_key('use_change', self.use_change, True)
+        self.electrumfair_config.set_key('use_change', self.use_change, True)
 
     use_unconfirmed = BooleanProperty(False)
     def on_use_unconfirmed(self, instance, x):
-        self.electrum_config.set_key('confirmed_only', not self.use_unconfirmed, True)
+        self.electrumfair_config.set_key('confirmed_only', not self.use_unconfirmed, True)
 
     def set_URI(self, uri):
         self.switch_to('send')
@@ -164,13 +164,13 @@ class ElectrumWindow(App):
         self._trigger_update_history()
 
     def _get_bu(self):
-        decimal_point = self.electrum_config.get('decimal_point', 5)
+        decimal_point = self.electrumfair_config.get('decimal_point', 5)
         return decimal_point_to_base_unit_name(decimal_point)
 
     def _set_bu(self, value):
         assert value in base_units.keys()
         decimal_point = base_unit_name_to_decimal_point(value)
-        self.electrum_config.set_key('decimal_point', decimal_point, True)
+        self.electrumfair_config.set_key('decimal_point', decimal_point, True)
         self._trigger_update_status()
         self._trigger_update_history()
 
@@ -257,7 +257,7 @@ class ElectrumWindow(App):
         App.__init__(self)#, **kwargs)
 
         title = _('ElectrumFair App')
-        self.electrum_config = config = kwargs.get('config', None)
+        self.electrumfair_config = config = kwargs.get('config', None)
         self.language = config.get('language', 'en')
         self.network = network = kwargs.get('network', None)
         if self.network:
@@ -286,7 +286,7 @@ class ElectrumWindow(App):
         # cached dialogs
         self._settings_dialog = None
         self._password_dialog = None
-        self.fee_status = self.electrum_config.get_fee_status()
+        self.fee_status = self.electrumfair_config.get_fee_status()
 
     def wallet_name(self):
         return os.path.basename(self.wallet.storage.path) if self.wallet else ' '
@@ -367,7 +367,7 @@ class ElectrumWindow(App):
         memo = req.get('memo')
         amount = req.get('amount')
         fund = req.get('fund')
-        popup = Builder.load_file('electrum/gui/kivy/uix/ui_screens/invoice.kv')
+        popup = Builder.load_file('electrumfair/gui/kivy/uix/ui_screens/invoice.kv')
         popup.is_invoice = is_invoice
         popup.amount = amount
         popup.requestor = requestor if is_invoice else req.get('address')
@@ -386,7 +386,7 @@ class ElectrumWindow(App):
         from electrumfair.util import format_time
         fund = req.get('fund')
         isaddr = 'y'
-        popup = Builder.load_file('electrum/gui/kivy/uix/ui_screens/invoice.kv')
+        popup = Builder.load_file('electrumfair/gui/kivy/uix/ui_screens/invoice.kv')
         popup.isaddr = isaddr
         popup.is_invoice = False
         popup.status = status
@@ -413,7 +413,7 @@ class ElectrumWindow(App):
         from jnius import autoclass, cast
         from android import activity
         PythonActivity = autoclass('org.kivy.android.PythonActivity')
-        SimpleScannerActivity = autoclass("org.electrum.qr.SimpleScannerActivity")
+        SimpleScannerActivity = autoclass("org.electrumfair.qr.SimpleScannerActivity")
         Intent = autoclass('android.content.Intent')
         intent = Intent(PythonActivity.mActivity, SimpleScannerActivity)
 
@@ -446,7 +446,7 @@ class ElectrumWindow(App):
         currentActivity.startActivity(it)
 
     def build(self):
-        return Builder.load_file('electrum/gui/kivy/main.kv')
+        return Builder.load_file('electrumfair/gui/kivy/main.kv')
 
     def _pause(self):
         if platform == 'android':
@@ -491,9 +491,9 @@ class ElectrumWindow(App):
             self.network.register_callback(self.on_quotes, ['on_quotes'])
             self.network.register_callback(self.on_history, ['on_history'])
         # load wallet
-        self.load_wallet_by_name(self.electrum_config.get_wallet_path())
+        self.load_wallet_by_name(self.electrumfair_config.get_wallet_path())
         # URI passed in config
-        uri = self.electrum_config.get('url')
+        uri = self.electrumfair_config.get('url')
         if uri:
             self.set_URI(uri)
 
@@ -512,7 +512,7 @@ class ElectrumWindow(App):
         elif not self.wallet:
             # wizard did not return a wallet; and there is no wallet open atm
             # try to open last saved wallet (potentially start wizard again)
-            self.load_wallet_by_name(self.electrum_config.get_wallet_path(), ask_if_wizard=True)
+            self.load_wallet_by_name(self.electrumfair_config.get_wallet_path(), ask_if_wizard=True)
 
     def load_wallet_by_name(self, path, ask_if_wizard=False):
         if not path:
@@ -530,7 +530,7 @@ class ElectrumWindow(App):
 
             def launch_wizard():
                 storage = WalletStorage(path, manual_upgrades=True)
-                wizard = Factory.InstallWizard(self.electrum_config, self.plugins, storage)
+                wizard = Factory.InstallWizard(self.electrumfair_config, self.plugins, storage)
                 wizard.bind(on_wizard_complete=self.on_wizard_complete)
                 action = wizard.storage.get_action()
                 wizard.run(action)
@@ -552,7 +552,7 @@ class ElectrumWindow(App):
     def on_stop(self):
         Logger.info('on_stop')
         if self.wallet:
-            self.electrum_config.save_last_wallet(self.wallet)
+            self.electrumfair_config.save_last_wallet(self.wallet)
         self.stop_wallet()
 
     def stop_wallet(self):
@@ -604,7 +604,7 @@ class ElectrumWindow(App):
             d = WalletDialog()
             d.open()
         elif name == 'status':
-            popup = Builder.load_file('electrum/gui/kivy/uix/ui_screens/'+name+'.kv')
+            popup = Builder.load_file('electrumfair/gui/kivy/uix/ui_screens/'+name+'.kv')
             master_public_keys_layout = popup.ids.master_public_keys
             for xpub in self.wallet.get_master_public_keys()[1:]:
                 master_public_keys_layout.add_widget(TopLabel(text=_('Master Public Key')))
@@ -614,12 +614,12 @@ class ElectrumWindow(App):
                 master_public_keys_layout.add_widget(ref)
             popup.open()
         else:
-            popup = Builder.load_file('electrum/gui/kivy/uix/ui_screens/'+name+'.kv')
+            popup = Builder.load_file('electrumfair/gui/kivy/uix/ui_screens/'+name+'.kv')
             popup.open()
 
     @profiler
     def init_ui(self):
-        ''' Initialize The Ux part of electrum. This function performs the basic
+        ''' Initialize The Ux part of electrumfair. This function performs the basic
         tasks of setting up the ui.
         '''
         #from weakref import ref
@@ -635,8 +635,8 @@ class ElectrumWindow(App):
                          module='electrumfair.gui.kivy.uix.qrcodewidget')
 
         # preload widgets. Remove this if you want to load the widgets on demand
-        #Cache.append('electrum_widgets', 'AnimatedPopup', Factory.AnimatedPopup())
-        #Cache.append('electrum_widgets', 'QRCodeWidget', Factory.QRCodeWidget())
+        #Cache.append('electrumfair_widgets', 'AnimatedPopup', Factory.AnimatedPopup())
+        #Cache.append('electrumfair_widgets', 'QRCodeWidget', Factory.QRCodeWidget())
 
         # load and focus the ui
         self.root.manager = self.root.ids['manager']
@@ -714,16 +714,16 @@ class ElectrumWindow(App):
         self.fiat_balance = self.fx.format_amount(c+u+x) + ' [size=22dp]%s[/size]'% self.fx.ccy
 
     def get_max_amount(self):
-        from electrum.transaction import TxOutput
+        from electrumfair.transaction import TxOutput
         if run_hook('abort_send', self):
             return ''
-        inputs = self.wallet.get_spendable_coins(None, self.electrum_config)
+        inputs = self.wallet.get_spendable_coins(None, self.electrumfair_config)
         if not inputs:
             return ''
         addr = str(self.send_screen.screen.address) or self.wallet.dummy_address()
         outputs = [TxOutput(TYPE_ADDRESS, addr, '!')]
         try:
-            tx = self.wallet.make_unsigned_transaction(inputs, outputs, self.electrum_config)
+            tx = self.wallet.make_unsigned_transaction(inputs, outputs, self.electrumfair_config)
         except NoDynamicFeeEstimates as e:
             Clock.schedule_once(lambda dt, bound_e=e: self.show_error(str(bound_e)))
             return ''
@@ -790,7 +790,7 @@ class ElectrumWindow(App):
         self.send_payment(address, amount=amount, label=label, message=message)
 
     def show_error(self, error, width='200dp', pos=None, arrow_pos=None,
-        exit=False, icon='atlas://electrum/gui/kivy/theming/light/error', duration=0,
+        exit=False, icon='atlas://electrumfair/gui/kivy/theming/light/error', duration=0,
         modal=False):
         ''' Show an error Message Bubble.
         '''
@@ -802,7 +802,7 @@ class ElectrumWindow(App):
         exit=False, duration=0, modal=False):
         ''' Show an Info Message Bubble.
         '''
-        self.show_error(error, icon='atlas://electrum/gui/kivy/theming/light/important',
+        self.show_error(error, icon='atlas://electrumfair/gui/kivy/theming/light/important',
             duration=duration, modal=modal, exit=exit, pos=pos,
             arrow_pos=arrow_pos)
 
@@ -842,7 +842,7 @@ class ElectrumWindow(App):
             info_bubble.show_arrow = False
             img.allow_stretch = True
             info_bubble.dim_background = True
-            info_bubble.background_image = 'atlas://electrum/gui/kivy/theming/light/card'
+            info_bubble.background_image = 'atlas://electrumfair/gui/kivy/theming/light/card'
         else:
             info_bubble.fs = False
             info_bubble.icon = icon
@@ -931,7 +931,7 @@ class ElectrumWindow(App):
 
     def requests_dialog(self, screen):
         from .uix.dialogs.requests import RequestsDialog
-        if len(self.wallet.get_sorted_requests(self.electrum_config)) == 0:
+        if len(self.wallet.get_sorted_requests(self.electrumfair_config)) == 0:
             self.show_info(_('No saved requests.'))
             return
         popup = RequestsDialog(self, screen, None)
@@ -947,12 +947,12 @@ class ElectrumWindow(App):
     def fee_dialog(self, label, dt):
         from .uix.dialogs.fee_dialog import FeeDialog
         def cb():
-            self.fee_status = self.electrum_config.get_fee_status()
-        fee_dialog = FeeDialog(self, self.electrum_config, cb)
+            self.fee_status = self.electrumfair_config.get_fee_status()
+        fee_dialog = FeeDialog(self, self.electrumfair_config, cb)
         fee_dialog.open()
 
     def on_fee(self, event, *arg):
-        self.fee_status = self.electrum_config.get_fee_status()
+        self.fee_status = self.electrumfair_config.get_fee_status()
 
     def protected(self, msg, f, args):
         if self.wallet.has_password():
@@ -985,7 +985,7 @@ class ElectrumWindow(App):
         self.stop_wallet()
         os.unlink(wallet_path)
         self.show_error(_("Wallet removed: {}").format(basename))
-        new_path = self.electrum_config.get_wallet_path()
+        new_path = self.electrumfair_config.get_wallet_path()
         self.load_wallet_by_name(new_path)
 
     def show_seed(self, label):

@@ -64,7 +64,7 @@ android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, C
 #android.sdk = 21
 
 # (str) Android NDK version to use
-#android.ndk = 9
+android.ndk = 10.3.2
 
 # (bool) Use --private data storage (True) or --dir public storage (False)
 android.private_storage = True
