@@ -46,7 +46,6 @@ def check_imports():
         import ecdsa
         import requests
         import qrcode
-        import pbkdf2
         import google.protobuf
         import jsonrpclib
     except ImportError as e:
@@ -64,10 +63,12 @@ def check_imports():
 if not is_android:
     check_imports()
 
+
 from electrumfair import bitcoin, util
 from electrumfair import constants
 from electrumfair import SimpleConfig, Network
 from electrumfair.wallet import Wallet, Imported_Wallet
+from electrumfair import bitcoin, util, constants
 from electrumfair.storage import WalletStorage, get_derivation_used_for_hw_device_encryption
 from electrumfair.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
 from electrumfair.util import set_verbosity, InvalidPassword
@@ -75,7 +76,6 @@ from electrumfair.commands import get_parser, known_commands, Commands, config_v
 from electrumfair import daemon
 from electrumfair import keystore
 from electrumfair.mnemonic import Mnemonic
-
 
 # get password routine
 def prompt_password(prompt, confirm=True):
@@ -363,7 +363,7 @@ if __name__ == '__main__':
     # config is an object passed to the various constructors (wallet, interface, gui)
     if is_android:
         config_options = {
-            'verbose': True,
+            'verbosity': '',
             'cmd': 'gui',
             'gui': 'kivy',
         }
@@ -384,7 +384,7 @@ if __name__ == '__main__':
         config_options['electrumfair_path'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'electrumfair_data')
 
     # kivy sometimes freezes when we write to sys.stderr
-    set_verbosity(config_options.get('verbose') and config_options.get('gui')!='kivy')
+    set_verbosity(config_options.get('verbosity') if config_options.get('gui') != 'kivy' else '')
 
     # check uri
     uri = config_options.get('url')

@@ -177,8 +177,8 @@ class PrintError(object):
         return self.__class__.__name__
 
     def print_error(self, *msg):
-        #if self.verbosity_filter in verbosity or verbosity == '*': #error TypeError: argument of type 'NoneType' is not iterable
-        print_error("[%s]" % self.diagnostic_name(), *msg)
+        if self.verbosity_filter in verbosity or verbosity == '*':
+            print_error("[%s]" % self.diagnostic_name(), *msg)
 
     def print_stderr(self, *msg):
         print_stderr("[%s]" % self.diagnostic_name(), *msg)

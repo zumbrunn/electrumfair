@@ -153,7 +153,7 @@ class Plugins(DaemonThread):
 
     def register_wallet_type(self, name, gui_good, wallet_type):
         from .wallet import register_wallet_type, register_constructor
-        #self.print_error("registering wallet type", (wallet_type, name))
+        self.print_error("registering wallet type", (wallet_type, name))
         def loader():
             plugin = self.get_plugin(name)
             register_constructor(wallet_type, plugin.wallet_class)
