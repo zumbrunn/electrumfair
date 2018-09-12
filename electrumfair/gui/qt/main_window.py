@@ -3041,7 +3041,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.gui_object.close_window(self)
 
     def plugins_dialog(self):
-        self.pluginsdialog = d = WindowModalDialog(self, _('Electrum Plugins'))
+        self.pluginsdialog = d = WindowModalDialog(self, _('Electrumfair Plugins'))
 
         plugins = self.gui_object.plugins
 
@@ -3081,6 +3081,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         for i, descr in enumerate(plugins.descriptions.values()):
             full_name = descr['__name__']
             prefix, _separator, name = full_name.rpartition('.')
+            if name == 'greenaddress_instant': continue
             p = plugins.get(name)
             if descr.get('registers_keystore'):
                 continue
