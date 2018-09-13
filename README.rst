@@ -74,7 +74,7 @@ Render the SVG icons to PNGs (optional)::
 Compile the icons file for Qt::
 
     sudo apt-get install pyqt5-dev-tools
-    pyrcc5 icons.qrc -o electrum/gui/qt/icons_rc.py
+    pyrcc5 icons.qrc -o electrumfair/gui/qt/icons_rc.py
 
 Compile the protobuf description file::
 
