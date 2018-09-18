@@ -17,7 +17,7 @@ Builder.load_string('''
     amount: ''
     status: ''
     date: ''
-    icon: 'atlas://electrum/gui/kivy/theming/light/important'
+    icon: 'atlas://electrumfairfair/gui/kivy/theming/light/important'
     Image:
         id: icon
         source: root.icon

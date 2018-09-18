@@ -17,7 +17,7 @@ Builder.load_string('''
 
 <SettingsDialog@Popup>
     id: settings
-    title: _('Electrum Settings')
+    title: _('ElectrumFair Settings')
     disable_pin: False
     use_encryption: False
     BoxLayout:
@@ -105,7 +105,7 @@ class SettingsDialog(Factory.Popup):
     def __init__(self, app):
         self.app = app
         self.plugins = self.app.plugins
-        self.config = self.app.electrum_config
+        self.config = self.app.electrumfair_config
         Factory.Popup.__init__(self)
         layout = self.ids.scrollviewlayout
         layout.bind(minimum_height=layout.setter('height'))
@@ -147,7 +147,7 @@ class SettingsDialog(Factory.Popup):
         self._unit_dialog.open()
 
     def coinselect_status(self):
-        return coinchooser.get_name(self.app.electrum_config)
+        return coinchooser.get_name(self.app.electrumfair_config)
 
     def coinselect_dialog(self, item, dt):
         if self._coinselect_dialog is None:
@@ -179,7 +179,7 @@ class SettingsDialog(Factory.Popup):
                     proxy = None
                 self.app.network.set_parameters(server, port, protocol, proxy, auto_connect)
                 item.status = self.proxy_status()
-            popup = Builder.load_file('electrum/gui/kivy/uix/ui_screens/proxy.kv')
+            popup = Builder.load_file('electrumfair/gui/kivy/uix/ui_screens/proxy.kv')
             popup.ids.mode.text = proxy.get('mode') if proxy else 'None'
             popup.ids.host.text = proxy.get('host') if proxy else ''
             popup.ids.port.text = proxy.get('port') if proxy else ''

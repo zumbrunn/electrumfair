@@ -56,7 +56,6 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.label import Label
 from kivy.core.clipboard import Clipboard
 
-
 Factory.register('TabbedCarousel', module='electrumfair.gui.kivy.uix.screens')
 
 # Register fonts without this you won't be able to use bold/italic...
@@ -1033,6 +1032,10 @@ class ElectrumFairWindow(App):
                 return
             if not self.wallet.can_export():
                 return
-            key = str(self.wallet.export_private_key(addr, password)[0])
-            pk_label.data = key
+            try:
+                key = str(self.wallet.export_private_key(addr, password)[0])
+                pk_label.data = key
+            except InvalidPassword:
+                self.show_error("Invalid PIN")
+                return
         self.protected(_("Enter your PIN code in order to decrypt your private key"), show_private_key, (addr, pk_label))
