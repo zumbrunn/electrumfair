@@ -9,9 +9,9 @@ from kivy.lang import Builder
 from kivy.uix.label import Label
 from kivy.utils import platform
 
-from electrum.gui.kivy.i18n import _
+from electrumfair.gui.kivy.i18n import _
 
-from electrum.base_crash_reporter import BaseCrashReporter
+from electrumfair.base_crash_reporter import BaseCrashReporter
 
 
 Builder.load_string('''
@@ -51,15 +51,15 @@ Builder.load_string('''
             size_hint: 1, None
             height: '48dp'
             orientation: 'horizontal'
+            #Button:
+            #    height: '48dp'
+            #    text: 'Send'
+            #    on_release: root.send_report()
+            #Button:
+            #    text: 'Never'
+            #    on_release: root.show_never()
             Button:
-                height: '48dp'
-                text: 'Send'
-                on_release: root.send_report()
-            Button:
-                text: 'Never'
-                on_release: root.show_never()
-            Button:
-                text: 'Not now'
+                text: 'Exit'
                 on_release: root.dismiss()
 
 <CrashReportDetails@Popup>

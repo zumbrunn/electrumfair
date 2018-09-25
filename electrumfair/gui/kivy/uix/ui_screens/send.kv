@@ -89,7 +89,7 @@ SendScreen:
                     id: fee_e
                     default_text: _('Fee')
                     text: app.fee_status
-                    on_release: Clock.schedule_once(lambda dt: app.fee_dialog(s, True))
+                    #on_release: Clock.schedule_once(lambda dt: app.fee_dialog(s, True))
         BoxLayout:
             size_hint: 1, None
             height: '48dp'

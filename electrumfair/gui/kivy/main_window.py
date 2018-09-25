@@ -72,7 +72,7 @@ from electrumfair.util import (base_units, NoDynamicFeeEstimates, decimal_point_
                            base_unit_name_to_decimal_point, NotEnoughFunds)
 
 
-class ElectrumFairWindow(App):
+class ElectrumWindow(App):
 
     electrumfair_config = ObjectProperty(None)
     language = StringProperty('en')
