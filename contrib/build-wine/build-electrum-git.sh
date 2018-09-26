@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME_ROOT=electrum
+NAME_ROOT=electrumfair
 PYTHON_VERSION=3.6.6
 
 # These settings probably don't need any change
@@ -19,7 +19,7 @@ set -e
 mkdir -p tmp
 cd tmp
 
-pushd $WINEPREFIX/drive_c/electrum
+pushd $WINEPREFIX/drive_c/electrumfair
 
 # Load electrum-icons and electrum-locale for this release
 git submodule init
@@ -43,16 +43,16 @@ popd
 find -exec touch -d '2000-11-11T11:11:11+00:00' {} +
 popd
 
-cp $WINEPREFIX/drive_c/electrum/LICENCE .
-cp -r $WINEPREFIX/drive_c/electrum/contrib/deterministic-build/electrum-locale/locale $WINEPREFIX/drive_c/electrum/electrum/
-cp $WINEPREFIX/drive_c/electrum/contrib/deterministic-build/electrum-icons/icons_rc.py $WINEPREFIX/drive_c/electrum/electrum/gui/qt/
+cp $WINEPREFIX/drive_c/electrumfair/LICENCE .
+cp -r $WINEPREFIX/drive_c/electrumfair/contrib/deterministic-build/electrum-locale/locale $WINEPREFIX/drive_c/electrumfair/electrumfair/
+cp $WINEPREFIX/drive_c/electrumfair/contrib/deterministic-build/electrum-icons/icons_rc.py $WINEPREFIX/drive_c/electrumfair/electrumfair/gui/qt/
 
 # Install frozen dependencies
 $PYTHON -m pip install -r ../../deterministic-build/requirements.txt
 
 $PYTHON -m pip install -r ../../deterministic-build/requirements-hw.txt
 
-pushd $WINEPREFIX/drive_c/electrum
+pushd $WINEPREFIX/drive_c/electrumfair
 $PYTHON setup.py install
 popd
 
@@ -73,7 +73,7 @@ popd
 wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION electrum.nsi
 
 cd dist
-mv electrum-setup.exe $NAME_ROOT-$VERSION-setup.exe
+mv electrumfair-setup.exe $NAME_ROOT-$VERSION-setup.exe
 cd ..
 
 echo "Done."
