@@ -5,7 +5,7 @@ from io import BytesIO
 import sys
 import platform
 
-from electrumfair.plugin. import BasePlugin, hook
+from electrumfair.plugin import BasePlugin, hook
 from electrumfair.gui.qt.util import WaitingDialog, EnterButton, WindowModalDialog
 from electrumfair.util import print_msg, print_error
 from electrumfair.i18n import _
