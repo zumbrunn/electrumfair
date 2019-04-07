@@ -32,15 +32,28 @@ import ast
 import base64
 from functools import wraps
 from decimal import Decimal
+from typing import Optional, TYPE_CHECKING
 
 from .import util, ecc
-from .util import bfh, bh2u, format_satoshis, json_decode, print_error, json_encode
+from .util import bfh, bh2u, format_satoshis, json_decode, print_error, json_encode, is_hash256_str
 from . import bitcoin
 from .bitcoin import is_address,  hash_160, COIN, TYPE_ADDRESS
+from . import bip32
+from .bip32 import BIP32Node
 from .i18n import _
 from .transaction import Transaction, multisig_script, TxOutput
 from .paymentrequest import PR_PAID, PR_UNPAID, PR_UNKNOWN, PR_EXPIRED
-from .plugin import run_hook
+from .synchronizer import Notifier
+from .storage import WalletStorage
+from . import keystore
+from .wallet import Wallet, Imported_Wallet, Abstract_Wallet, create_new_wallet, restore_wallet_from_text
+from .address_synchronizer import TX_HEIGHT_LOCAL
+from .mnemonic import Mnemonic
+
+if TYPE_CHECKING:
+    from .network import Network
+    from .simple_config import SimpleConfig
+
 
 known_commands = {}
 
@@ -91,7 +104,8 @@ def command(s):
 
 class Commands:
 
-    def __init__(self, config, wallet, network, callback = None):
+    def __init__(self, config: 'SimpleConfig', wallet: Abstract_Wallet,
+                 network: Optional['Network'], callback=None):
         self.config = config
         self.wallet = wallet
         self.network = network
@@ -123,17 +137,38 @@ class Commands:
         return ' '.join(sorted(known_commands.keys()))
 
     @command('')
-    def create(self, segwit=False):
-        """Create a new wallet"""
-        raise Exception('Not a JSON-RPC command')
+    def create(self, passphrase=None, password=None, encrypt_file=True, segwit=False):
+        """Create a new wallet.
+        If you want to be prompted for an argument, type '?' or ':' (concealed)
+        """
+        d = create_new_wallet(path=self.config.get_wallet_path(),
+                              passphrase=passphrase,
+                              password=password,
+                              encrypt_file=encrypt_file,
+                              segwit=segwit)
+        return {
+            'seed': d['seed'],
+            'path': d['wallet'].storage.path,
+            'msg': d['msg'],
+        }
 
-    @command('wn')
-    def restore(self, text):
+    @command('')
+    def restore(self, text, passphrase=None, password=None, encrypt_file=True):
         """Restore a wallet from text. Text can be a seed phrase, a master
         public key, a master private key, a list of bitcoin addresses
-        or bitcoin private keys. If you want to be prompted for your
-        seed, type '?' or ':' (concealed) """
-        raise Exception('Not a JSON-RPC command')
+        or bitcoin private keys.
+        If you want to be prompted for an argument, type '?' or ':' (concealed)
+        """
+        d = restore_wallet_from_text(text,
+                                     path=self.config.get_wallet_path(),
+                                     passphrase=passphrase,
+                                     password=password,
+                                     encrypt_file=encrypt_file,
+                                     network=self.network)
+        return {
+            'path': d['wallet'].storage.path,
+            'msg': d['msg'],
+        }
 
     @command('wp')
     def password(self, password=None, new_password=None):
@@ -144,6 +179,11 @@ class Commands:
         self.wallet.update_password(password, new_password, b)
         self.wallet.storage.write()
         return {'password':self.wallet.has_password()}
+
+    @command('w')
+    def get(self, key):
+        """Return item from wallet storage"""
+        return self.wallet.storage.get(key)
 
     @command('')
     def getconfig(self, key):
@@ -181,7 +221,7 @@ class Commands:
         walletless server query, results are not checked by SPV.
         """
         sh = bitcoin.address_to_scripthash(address)
-        return self.network.get_history_for_scripthash(sh)
+        return self.network.run_from_another_thread(self.network.get_history_for_scripthash(sh))
 
     @command('w')
     def listunspent(self):
@@ -199,7 +239,7 @@ class Commands:
         is a walletless server query, results are not checked by SPV.
         """
         sh = bitcoin.address_to_scripthash(address)
-        return self.network.listunspent_for_scripthash(sh)
+        return self.network.run_from_another_thread(self.network.listunspent_for_scripthash(sh))
 
     @command('')
     def serialize(self, jsontx):
@@ -249,13 +289,14 @@ class Commands:
     def deserialize(self, tx):
         """Deserialize a serialized transaction"""
         tx = Transaction(tx)
-        return tx.deserialize()
+        return tx.deserialize(force_full_parse=True)
 
     @command('n')
     def broadcast(self, tx):
         """Broadcast a transaction to the network. """
         tx = Transaction(tx)
-        return self.network.broadcast_transaction(tx)
+        self.network.run_from_another_thread(self.network.broadcast_transaction(tx))
+        return tx.txid()
 
     @command('')
     def createmultisig(self, num, pubkeys):
@@ -268,12 +309,12 @@ class Commands:
     @command('w')
     def freeze(self, address):
         """Freeze address. Freeze the funds at one of your wallet\'s addresses"""
-        return self.wallet.set_frozen_state([address], True)
+        return self.wallet.set_frozen_state_of_addresses([address], True)
 
     @command('w')
     def unfreeze(self, address):
         """Unfreeze address. Unfreeze the funds at one of your wallet\'s address"""
-        return self.wallet.set_frozen_state([address], False)
+        return self.wallet.set_frozen_state_of_addresses([address], False)
 
     @command('wp')
     def getprivatekeys(self, address, password=None):
@@ -322,7 +363,7 @@ class Commands:
         server query, results are not checked by SPV.
         """
         sh = bitcoin.address_to_scripthash(address)
-        out = self.network.get_balance_for_scripthash(sh)
+        out = self.network.run_from_another_thread(self.network.get_balance_for_scripthash(sh))
         out["confirmed"] =  str(Decimal(out["confirmed"])/COIN)
         out["unconfirmed"] =  str(Decimal(out["unconfirmed"])/COIN)
         return out
@@ -331,7 +372,7 @@ class Commands:
     def getmerkle(self, txid, height):
         """Get Merkle branch of a transaction included in a block. Electrum
         uses this to verify transactions (Simple Payment Verification)."""
-        return self.network.get_merkle_for_transaction(txid, int(height))
+        return self.network.run_from_another_thread(self.network.get_merkle_for_transaction(txid, int(height)))
 
     @command('n')
     def getservers(self):
@@ -354,6 +395,15 @@ class Commands:
         """Get master private key. Return your wallet\'s master private key"""
         return str(self.wallet.keystore.get_master_private_key(password))
 
+    @command('')
+    def convert_xkey(self, xkey, xtype):
+        """Convert xtype of a master key. e.g. xpub -> ypub"""
+        try:
+            node = BIP32Node.from_xkey(xkey)
+        except:
+            raise Exception('xkey should be a master public/private key')
+        return node._replace(xtype=xtype).to_xkey()
+
     @command('wp')
     def getseed(self, password=None):
         """Get seed phrase. Print the generation seed of your wallet."""
@@ -368,7 +418,7 @@ class Commands:
         try:
             addr = self.wallet.import_private_key(privkey, password)
             out = "Keypair imported: " + addr
-        except BaseException as e:
+        except Exception as e:
             out = "Error: " + str(e)
         return out
 
@@ -419,7 +469,7 @@ class Commands:
 
         coins = self.wallet.get_spendable_coins(domain, self.config)
         tx = self.wallet.make_unsigned_transaction(coins, final_outputs, self.config, fee, change_addr)
-        if locktime != None: 
+        if locktime != None:
             tx.locktime = locktime
         if rbf is None:
             rbf = self.config.get('use_rbf', True)
@@ -446,9 +496,15 @@ class Commands:
         return tx.as_dict()
 
     @command('w')
-    def history(self, year=None, show_addresses=False, show_fiat=False):
+    def history(self, year=None, show_addresses=False, show_fiat=False, show_fees=False,
+                from_height=None, to_height=None):
         """Wallet history. Returns the transaction history of your wallet."""
-        kwargs = {'show_addresses': show_addresses}
+        kwargs = {
+            'show_addresses': show_addresses,
+            'show_fees': show_fees,
+            'from_height': from_height,
+            'to_height': to_height,
+        }
         if year:
             import time
             start_date = datetime.datetime(year, 1, 1)
@@ -491,7 +547,7 @@ class Commands:
         """List wallet addresses. Returns the list of all addresses in your wallet. Use optional arguments to filter the results."""
         out = []
         for addr in self.wallet.get_addresses():
-            if frozen and not self.wallet.is_frozen(addr):
+            if frozen and not self.wallet.is_frozen_address(addr):
                 continue
             if receiving and self.wallet.is_change(addr):
                 continue
@@ -514,10 +570,11 @@ class Commands:
     @command('n')
     def gettransaction(self, txid):
         """Retrieve a transaction. """
-        if self.wallet and txid in self.wallet.transactions:
-            tx = self.wallet.transactions[txid]
-        else:
-            raw = self.network.get_transaction(txid)
+        tx = None
+        if self.wallet:
+            tx = self.wallet.db.get_transaction(txid)
+        if tx is None:
+            raw = self.network.run_from_another_thread(self.network.get_transaction(txid))
             if raw:
                 tx = Transaction(raw)
             else:
@@ -611,7 +668,7 @@ class Commands:
         tx = Transaction(tx)
         if not self.wallet.add_transaction(tx.txid(), tx):
             return False
-        self.wallet.save_transactions()
+        self.wallet.storage.write()
         return tx.txid()
 
     @command('wp')
@@ -635,20 +692,11 @@ class Commands:
             self.wallet.remove_payment_request(k, self.config)
 
     @command('n')
-    def notify(self, address, URL):
+    def notify(self, address: str, URL: str):
         """Watch an address. Every time the address changes, a http POST is sent to the URL."""
-        def callback(x):
-            import urllib.request
-            headers = {'content-type':'application/json'}
-            data = {'address':address, 'status':x.get('result')}
-            serialized_data = util.to_bytes(json.dumps(data))
-            try:
-                req = urllib.request.Request(URL, serialized_data, headers)
-                response_stream = urllib.request.urlopen(req, timeout=5)
-                util.print_error('Got Response for %s' % address)
-            except BaseException as e:
-                util.print_error(str(e))
-        self.network.subscribe_to_addresses([address], callback)
+        if not hasattr(self, "_notifier"):
+            self._notifier = Notifier(self.network)
+        self.network.run_from_another_thread(self._notifier.start_watching_queue.put((address, URL)))
         return True
 
     @command('wn')
@@ -675,10 +723,50 @@ class Commands:
             fee_level = Decimal(fee_level)
         return self.config.fee_per_kb(dyn=dyn, mempool=mempool, fee_level=fee_level)
 
+    @command('w')
+    def removelocaltx(self, txid):
+        """Remove a 'local' transaction from the wallet, and its dependent
+        transactions.
+        """
+        if not is_hash256_str(txid):
+            raise Exception(f"{repr(txid)} is not a txid")
+        height = self.wallet.get_tx_height(txid).height
+        to_delete = {txid}
+        if height != TX_HEIGHT_LOCAL:
+            raise Exception(f'Only local transactions can be removed. '
+                            f'This tx has height: {height} != {TX_HEIGHT_LOCAL}')
+        to_delete |= self.wallet.get_depending_transactions(txid)
+        for tx_hash in to_delete:
+            self.wallet.remove_transaction(tx_hash)
+        self.wallet.storage.write()
+
+    @command('wn')
+    def get_tx_status(self, txid):
+        """Returns some information regarding the tx. For now, only confirmations.
+        The transaction must be related to the wallet.
+        """
+        if not is_hash256_str(txid):
+            raise Exception(f"{repr(txid)} is not a txid")
+        if not self.wallet.db.get_transaction(txid):
+            raise Exception("Transaction not in wallet.")
+        return {
+            "confirmations": self.wallet.get_tx_height(txid).conf,
+        }
+
     @command('')
     def help(self):
         # for the python console
         return sorted(known_commands.keys())
+
+
+def eval_bool(x: str) -> bool:
+    if x == 'false': return False
+    if x == 'true': return True
+    try:
+        return bool(ast.literal_eval(x))
+    except:
+        return bool(x)
+
 
 param_descriptions = {
     'privkey': 'Private key. Type \'?\' to get a prompt.',
@@ -702,6 +790,7 @@ param_descriptions = {
 command_options = {
     'password':    ("-W", "Password"),
     'new_password':(None, "New Password"),
+    'encrypt_file':(None, "Whether the file on disk should be encrypted with the provided password"),
     'receiving':   (None, "Show only receiving addresses"),
     'change':      (None, "Show only change addresses"),
     'frozen':      (None, "Show only frozen addresses"),
@@ -717,6 +806,7 @@ command_options = {
     'nbits':       (None, "Number of bits of entropy"),
     'segwit':      (None, "Create segwit seed"),
     'language':    ("-L", "Default language for wordlist"),
+    'passphrase':  (None, "Seed extension"),
     'privkey':     (None, "Private key. Set to '?' to get a prompt."),
     'unsigned':    ("-u", "Do not sign transaction"),
     'rbf':         (None, "Replace-by-fee transaction"),
@@ -731,9 +821,12 @@ command_options = {
     'paid':        (None, "Show only paid requests."),
     'show_addresses': (None, "Show input and output addresses"),
     'show_fiat':   (None, "Show fiat value of transactions"),
+    'show_fees':   (None, "Show miner fees paid by transactions"),
     'year':        (None, "Show history for a given year"),
     'fee_method':  (None, "Fee estimation method to use"),
-    'fee_level':   (None, "Float between 0.0 and 1.0, representing fee slider position")
+    'fee_level':   (None, "Float between 0.0 and 1.0, representing fee slider position"),
+    'from_height': (None, "Only show transactions that confirmed after given block height"),
+    'to_height':   (None, "Only show transactions that confirmed before given block height"),
 }
 
 
@@ -745,6 +838,8 @@ arg_types = {
     'nbits': int,
     'imax': int,
     'year': int,
+    'from_height': int,
+    'to_height': int,
     'tx': tx_from_str,
     'pubkeys': json_loads,
     'jsontx': json_loads,
@@ -755,6 +850,7 @@ arg_types = {
     'locktime': int,
     'fee_method': str,
     'fee_level': json_loads,
+    'encrypt_file': eval_bool,
 }
 
 config_variables = {
@@ -827,6 +923,7 @@ def add_network_options(parser):
     parser.add_argument("-s", "--server", dest="server", default=None, help="set server host:port:protocol, where protocol is either t (tcp) or s (ssl)")
     parser.add_argument("-p", "--proxy", dest="proxy", default=None, help="set proxy [type:]host[:port], where type is socks4,socks5 or http")
     parser.add_argument("--noonion", action="store_true", dest="noonion", default=None, help="do not try to connect to onion servers")
+    parser.add_argument("--skipmerklecheck", action="store_true", dest="skipmerklecheck", default=False, help="Tolerate invalid merkle proofs from server")
 
 def add_global_options(parser):
     group = parser.add_argument_group('global options')
@@ -853,6 +950,7 @@ def get_parser():
     parser_gui.add_argument("-o", "--offline", action="store_true", dest="offline", default=False, help="Run offline")
     parser_gui.add_argument("-m", action="store_true", dest="hide_gui", default=False, help="hide GUI on startup")
     parser_gui.add_argument("-L", "--lang", dest="language", default=None, help="default language used in GUI")
+    parser_gui.add_argument("--daemon", action="store_true", dest="daemon", default=False, help="keep daemon running after GUI is closed")
     add_network_options(parser_gui)
     add_global_options(parser_gui)
     # daemon
@@ -866,12 +964,10 @@ def get_parser():
         cmd = known_commands[cmdname]
         p = subparsers.add_parser(cmdname, help=cmd.help, description=cmd.description)
         add_global_options(p)
-        if cmdname == 'restore':
-            p.add_argument("-o", "--offline", action="store_true", dest="offline", default=False, help="Run offline")
         for optname, default in zip(cmd.options, cmd.defaults):
             a, help = command_options[optname]
             b = '--' + optname
-            action = "store_true" if type(default) is bool else 'store'
+            action = "store_true" if default is False else 'store'
             args = (a, b) if a else (b,)
             if action == 'store':
                 _type = arg_types.get(optname, str)
