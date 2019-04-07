@@ -13,7 +13,7 @@ except ImportError as e:
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 os.chdir('..')
 
-cmd = "find electrum -type f -name '*.py' -o -name '*.kv'"
+cmd = "find electrumfair -type f -name '*.py' -o -name '*.kv'"
 
 files = subprocess.check_output(cmd, shell=True)
 
@@ -23,13 +23,13 @@ with open("app.fil", "wb") as f:
 print("Found {} files to translate".format(len(files.splitlines())))
 
 # Generate fresh translation template
-if not os.path.exists('electrum/locale'):
-    os.mkdir('electrum/locale')
-cmd = 'xgettext -s --from-code UTF-8 --language Python --no-wrap -f app.fil --output=electrum/locale/messages.pot'
+if not os.path.exists('electrumfair/locale'):
+    os.mkdir('electrumfair/locale')
+cmd = 'xgettext -s --from-code UTF-8 --language Python --no-wrap -f app.fil --output=electrumfair/locale/messages.pot'
 print('Generate template')
 os.system(cmd)
 
-os.chdir('electrum')
+os.chdir('electrumfair')
 
 crowdin_identifier = 'electrum'
 crowdin_file_name = 'files[electrum-client/messages.pot]'
@@ -73,6 +73,9 @@ for name in zfobj.namelist():
         with open(name[16:], 'wb') as output:
             output.write(zfobj.read(name))
 
+# Replace Bitcoin with FairCoin
+os.system("find locale -type f -name '*.po' -exec sed -i 's/bitcoin/FairCoin/gI' {} +")
+
 # Convert .po to .mo
 print('Installing')
 for lang in os.listdir('locale'):
@@ -82,6 +85,6 @@ for lang in os.listdir('locale'):
     mo_dir = 'locale/%s/LC_MESSAGES' % lang
     if not os.path.exists(mo_dir):
         os.mkdir(mo_dir)
-    cmd = 'msgfmt --output-file="%s/electrum.mo" "locale/%s/electrum.po"' % (mo_dir,lang)
+    cmd = 'msgfmt --output-file="%s/electrumfair.mo" "locale/%s/electrum.po"' % (mo_dir,lang)
     print('Installing', lang)
     os.system(cmd)

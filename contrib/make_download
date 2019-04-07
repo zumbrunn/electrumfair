@@ -3,8 +3,8 @@ import re
 import os
 import sys
 
-from electrum.version import ELECTRUM_VERSION, APK_VERSION
-print("version", ELECTRUM_VERSION)
+from electrumfair.version import ELECTRUMFAIR_VERSION, APK_VERSION
+print("version", ELECTRUMFAIR_VERSION)
 
 dirname = sys.argv[1]
 print("directory", dirname)
@@ -15,7 +15,7 @@ download_template = download_page + ".template"
 with open(download_template) as f:
     string = f.read()
 
-version = version_win = version_mac = version_android = ELECTRUM_VERSION
+version = version_win = version_mac = version_android = ELECTRUMFAIR_VERSION
 string = string.replace("##VERSION##", version)
 string = string.replace("##VERSION_WIN##", version_win)
 string = string.replace("##VERSION_MAC##", version_mac)
@@ -23,18 +23,18 @@ string = string.replace("##VERSION_ANDROID##", version_android)
 string = string.replace("##VERSION_APK##", APK_VERSION)
 
 files = {
-    'tgz': "Electrum-%s.tar.gz" % version,
-    'appimage': "electrum-%s-x86_64.AppImage" % version,
-    'zip': "Electrum-%s.zip" % version,
-    'mac': "electrum-%s.dmg" % version_mac,
-    'win': "electrum-%s.exe" % version_win,
-    'win_setup': "electrum-%s-setup.exe" % version_win,
-    'win_portable': "electrum-%s-portable.exe" % version_win,
+    'tgz': "ElectrumFair-%s.tar.gz" % version,
+    'appimage': "electrumfair-%s-x86_64.AppImage" % version,
+    'zip': "ElectrumFair-%s.zip" % version,
+    'mac': "electrumfair-%s.dmg" % version_mac,
+    'win': "electrumfair-%s.exe" % version_win,
+    'win_setup': "electrumfair-%s-setup.exe" % version_win,
+    'win_portable': "electrumfair-%s-portable.exe" % version_win,
 }
 
 for k, n in files.items():
     path = "dist/%s"%n
-    link = "https://download.electrum.org/%s/%s"%(version,n)
+    link = "https://download.faricoin.world/%s/%s"%(version,n)
     if not os.path.exists(path):
         os.system("wget -q %s -O %s" % (link, path))
     if not os.path.getsize(path):

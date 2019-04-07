@@ -46,8 +46,8 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
         else:
             usr_share = os.path.expanduser('~/.local/share')
     data_files += [
-        (os.path.join(usr_share, 'applications/'), ['electrum.desktop']),
-        (os.path.join(usr_share, icons_dirname), ['electrum/gui/icons/electrum.png']),
+        (os.path.join(usr_share, 'applications/'), ['electrumfair.desktop']),
+        (os.path.join(usr_share, icons_dirname), ['icons/electrumfair.png'])
     ]
 
 extras_require = {
@@ -57,38 +57,37 @@ extras_require = {
 }
 extras_require['full'] = [pkg for sublist in list(extras_require.values()) for pkg in sublist]
 
-
 setup(
-    name="Electrum",
-    version=version.ELECTRUM_VERSION,
+    name="ElectrumFair",
+    version=version.ELECTRUMFAIR_VERSION,
     python_requires='>={}'.format(MIN_PYTHON_VERSION),
     install_requires=requirements,
     extras_require=extras_require,
     packages=[
-        'electrum',
-        'electrum.gui',
-        'electrum.gui.qt',
-        'electrum.plugins',
-    ] + [('electrum.plugins.'+pkg) for pkg in find_packages('electrum/plugins')],
+        'electrumfair',
+        'electrumfair.gui',
+        'electrumfair.gui.qt',
+        'electrumfair.plugins',
+    ] + [('electrumfair.plugins.'+pkg) for pkg in find_packages('electrumfair/plugins')],
     package_dir={
-        'electrum': 'electrum'
+        'electrumfair': 'electrum'
     },
     package_data={
         '': ['*.txt', '*.json', '*.ttf', '*.otf'],
-        'electrum': [
+        'electrumfair': [
             'wordlist/*.txt',
-            'locale/*/LC_MESSAGES/electrum.mo',
+            'locale/*/LC_MESSAGES/electrumfair.mo',
         ],
         'electrum.gui': [
             'icons/*',
         ],
     },
-    scripts=['electrum/electrum'],
+    scripts=['electrumfair/electrumfair'],
     data_files=data_files,
-    description="Lightweight Bitcoin Wallet",
-    author="Thomas Voegtlin",
-    author_email="thomasv@electrum.org",
+    description="Lightweight FairCoin Wallet",
+    author="Thomas Voegtlin, Thomas König (FairCoin)",
+    author_email="thomasv@electrum.org, tom@fair-coin.org",
     license="MIT Licence",
-    url="https://electrum.org",
-    long_description="""Lightweight Bitcoin Wallet""",
+    url="https://download.faircoin.world",
+    long_description="""Lightweight FairCoin Wallet""",
 )

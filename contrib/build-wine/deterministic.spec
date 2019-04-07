@@ -12,7 +12,7 @@ else:
 
 PYHOME = 'c:/python3'
 
-home = 'C:\\electrum\\'
+home = 'C:\\electrumfair\\'
 
 # see https://github.com/pyinstaller/pyinstaller/issues/2005
 hiddenimports = []
@@ -38,12 +38,11 @@ binaries += [b for b in collect_dynamic_libs('PyQt5') if 'qwindowsvista' in b[0]
 binaries += [('C:/tmp/libsecp256k1.dll', '.')]
 
 datas = [
-    (home+'electrum/*.json', 'electrum'),
-    (home+'electrum/wordlist/english.txt', 'electrum/wordlist'),
-    (home+'electrum/locale', 'electrum/locale'),
-    (home+'electrum/plugins', 'electrum/plugins'),
+    (home+'electrumfair/*.json', 'electrumfair'),
+    (home+'electrumfair/wordlist/english.txt', 'electrumfair/wordlist'),
+    (home+'electrumfair/locale', 'electrumfair/locale'),
+    (home+'electrumfair/plugins', 'electrumfair/plugins'),
     ('C:\\Program Files (x86)\\ZBar\\bin\\', '.'),
-    (home+'electrum/gui/icons', 'electrum/gui/icons'),
 ]
 datas += collect_data_files('trezorlib')
 datas += collect_data_files('safetlib')
@@ -52,23 +51,24 @@ datas += collect_data_files('keepkeylib')
 datas += collect_data_files('ckcc')
 
 # We don't put these files in to actually include them in the script but to make the Analysis method scan them for imports
-a = Analysis([home+'run_electrum',
-              home+'electrum/gui/qt/main_window.py',
-              home+'electrum/gui/text.py',
-              home+'electrum/util.py',
-              home+'electrum/wallet.py',
-              home+'electrum/simple_config.py',
-              home+'electrum/bitcoin.py',
-              home+'electrum/dnssec.py',
-              home+'electrum/commands.py',
-              home+'electrum/plugins/cosigner_pool/qt.py',
-              home+'electrum/plugins/email_requests/qt.py',
-              home+'electrum/plugins/trezor/qt.py',
-              home+'electrum/plugins/safe_t/client.py',
-              home+'electrum/plugins/safe_t/qt.py',
-              home+'electrum/plugins/keepkey/qt.py',
-              home+'electrum/plugins/ledger/qt.py',
-              home+'electrum/plugins/coldcard/qt.py',
+a = Analysis([home+'run_electrumfair',
+              home+'electrumfair/gui/qt/main_window.py',
+              home+'electrumfair/gui/text.py',
+              home+'electrumfair/util.py',
+              home+'electrumfair/wallet.py',
+              home+'electrumfair/simple_config.py',
+              home+'electrumfair/bitcoin.py',
+              home+'electrumfair/dnssec.py',
+              home+'electrumfair/commands.py',
+              home+'electrumfair/plugins/cosigner_pool/qt.py',
+              home+'electrumfair/plugins/email_requests/qt.py',
+              home+'electrumfair/plugins/trezor/client.py',
+              home+'electrumfair/plugins/trezor/qt.py',
+              home+'electrumfair/plugins/safe_t/client.py',
+              home+'electrumfair/plugins/safe_t/qt.py',
+              home+'electrumfair/plugins/keepkey/qt.py',
+              home+'electrumfair/plugins/ledger/qt.py',
+              home+'electrumfair/plugins/coldcard/qt.py',
               #home+'packages/requests/utils.py'
               ],
              binaries=binaries,
@@ -116,11 +116,11 @@ exe_standalone = EXE(
     a.scripts,
     a.binaries,
     a.datas,
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name + ".exe"),
+    name=os.path.join('build\\pyi.win32\\electrumfair', cmdline_name + ".exe"),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrumfair/gui/icons/electrumfair.ico',
     console=False)
     # console=True makes an annoying black box pop up, but it does make Electrum output command line commands, with this turned off no output will be given but commands can still be used
 
@@ -129,11 +129,11 @@ exe_portable = EXE(
     a.scripts,
     a.binaries,
     a.datas + [ ('is_portable', 'README.md', 'DATA' ) ],
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name + "-portable.exe"),
+    name=os.path.join('build\\pyi.win32\\electrumfair', cmdline_name + "-portable.exe"),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrumfair/gui/icons/electrumfair.ico',
     console=False)
 
 #####
@@ -143,11 +143,11 @@ exe_dependent = EXE(
     pyz,
     a.scripts,
     exclude_binaries=True,
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name),
+    name=os.path.join('build\\pyi.win32\\electrumfair', cmdline_name),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrumfair/gui/icons/electrumfair.ico',
     console=False)
 
 coll = COLLECT(
@@ -158,6 +158,6 @@ coll = COLLECT(
     strip=None,
     upx=True,
     debug=False,
-    icon=home+'electrum/gui/icons/electrum.ico',
+    icon=home+'electrumfair/gui/icons/electrumfair.ico',
     console=False,
-    name=os.path.join('dist', 'electrum'))
+    name=os.path.join('dist', 'electrumfair'))
