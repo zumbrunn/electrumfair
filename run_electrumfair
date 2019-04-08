@@ -75,16 +75,16 @@ def check_imports():
 if not is_android:
     check_imports()
 
-from electrum import util
-from electrum import constants
-from electrum import SimpleConfig
-from electrum.wallet import Wallet
-from electrum.storage import WalletStorage, get_derivation_used_for_hw_device_encryption
-from electrum.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
-from electrum.util import set_verbosity, InvalidPassword
-from electrum.commands import get_parser, known_commands, Commands, config_variables
-from electrum import daemon
-from electrum import keystore
+from electrumfair import util
+from electrumfair import constants
+from electrumfair import SimpleConfig
+from electrumfair.wallet import Wallet
+from electrumfair.storage import WalletStorage, get_derivation_used_for_hw_device_encryption
+from electrumfair.util import print_msg, print_stderr, json_encode, json_decode, UserCancelled
+from electrumfair.util import set_verbosity, InvalidPassword
+from electrumfair.commands import get_parser, known_commands, Commands, config_variables
+from electrumfair import daemon
+from electrumfair import keystore
 
 # get password routine
 def prompt_password(prompt, confirm=True):

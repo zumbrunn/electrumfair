@@ -64,7 +64,7 @@ from electrum.transaction import Transaction, TxOutput
 from electrum.address_synchronizer import AddTransactionException
 from electrum.wallet import (Multisig_Wallet, CannotBumpFee, Abstract_Wallet,
                              sweep_preparations, InternalAddressCorruption)
-from electrum.version import ELECTRUM_VERSION
+from electrum.version import ELECTRUMFAIR_VERSION
 from electrum.network import Network, TxBroadcastError, BestEffortRequestFailed
 from electrum.exchange_rate import FxThread
 from electrum.simple_config import SimpleConfig
@@ -449,7 +449,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
     def watching_only_changed(self):
         name = "ElectrumFair Testnet" if constants.net.TESTNET else "ElectrumFair"
-        title = '%s %s  -  %s' % (name, ELECTRUM_VERSION, self.wallet.basename())
+        title = '%s %s  -  %s' % (name, ELECTRUMFAIR_VERSION, self.wallet.basename())
         extra = [self.wallet.storage.get('wallet_type', '?')]
         if self.wallet.is_watching_only():
             extra.append(_('watching only'))

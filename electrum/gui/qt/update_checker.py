@@ -46,7 +46,7 @@ class UpdateCheck(QWidget, PrintError):
         self.content.addWidget(self.pb)
 
         versions = QHBoxLayout()
-        versions.addWidget(QLabel(_("Current version: {}".format(version.ELECTRUM_VERSION))))
+        versions.addWidget(QLabel(_("Current version: {}".format(version.ELECTRUMFAIR_VERSION))))
         self.latest_version_label = QLabel(_("Latest version: {}".format(" ")))
         versions.addWidget(self.latest_version_label)
         self.content.addLayout(versions)
@@ -74,7 +74,7 @@ class UpdateCheck(QWidget, PrintError):
 
     @staticmethod
     def is_newer(latest_version):
-        return latest_version > StrictVersion(version.ELECTRUM_VERSION)
+        return latest_version > StrictVersion(version.ELECTRUMFAIR_VERSION)
 
     def update_view(self, latest_version=None):
         if latest_version:

@@ -14,4 +14,4 @@ from .plugin import BasePlugin
 from .commands import Commands, known_commands
 
 
-__version__ = ELECTRUM_VERSION
+__version__ = ELECTRUMFAIR_VERSION
