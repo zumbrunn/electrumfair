@@ -68,7 +68,7 @@ setup(
         'electrumfair.gui',
         'electrumfair.gui.qt',
         'electrumfair.plugins',
-    ] + [('electrumfair.plugins.'+pkg) for pkg in find_packages('electrumfair/plugins')],
+    ] + [('electrumfair.plugins.'+pkg) for pkg in find_packages('electrum/plugins')],
     package_dir={
         'electrumfair': 'electrum'
     },
@@ -82,7 +82,7 @@ setup(
             'icons/*',
         ],
     },
-    scripts=['electrumfair/electrumfair'],
+    scripts=['electrum/electrumfair'],
     data_files=data_files,
     description="Lightweight FairCoin Wallet",
     author="Thomas Voegtlin, Thomas König (FairCoin)",
