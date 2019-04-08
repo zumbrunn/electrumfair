@@ -5,7 +5,7 @@ from typing import NamedTuple, Any
 from electrum.util import bfh, bh2u, versiontuple, UserCancelled, UserFacingException
 from electrum.bitcoin import TYPE_ADDRESS, TYPE_SCRIPT
 from electrum.bip32 import BIP32Node, convert_bip32_path_to_list_of_uint32 as parse_path
-from electrum import constants
+from electrumfair import constants
 from electrum.i18n import _
 from electrum.plugin import Device
 from electrum.transaction import deserialize, Transaction

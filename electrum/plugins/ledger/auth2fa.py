@@ -15,7 +15,7 @@ from btchip.btchip import BTChipException
 
 from electrum.i18n import _
 from electrum.util import print_msg
-from electrum import constants, bitcoin
+from electrumfair import constants, bitcoin
 from electrum.gui.qt.qrcodewidget import QRCodeWidget
 
 

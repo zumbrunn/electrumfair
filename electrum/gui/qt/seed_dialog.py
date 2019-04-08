@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import (QVBoxLayout, QCheckBox, QHBoxLayout, QLineEdit,
 
 from electrum.i18n import _
 from electrumfair.mnemonic import Mnemonic, seed_type
-import electrumfair.old_mnemonic
+import electrum.old_mnemonic
 
 from .util import (Buttons, OkButton, WWLabel, ButtonsTextEdit, icon_path,
                    EnterButton, CloseButton, WindowModalDialog)

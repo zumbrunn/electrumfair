@@ -29,8 +29,8 @@ from xmlrpc.client import ServerProxy
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QPushButton
 
-from electrum import util, keystore, ecc, crypto
-from electrum import transaction
+from electrumfair import util, keystore, ecc, crypto
+from electrumfair import transaction
 from electrum.bip32 import BIP32Node
 from electrum.plugin import BasePlugin, hook
 from electrum.i18n import _
