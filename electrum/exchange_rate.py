@@ -144,23 +144,17 @@ class ExchangeBase(PrintError):
 
 class ChainFaircoin(ExchangeBase):
 
-    def get_rates(self,ccy):
-        json = self.get_json('chain.fair-coin.org', '/download/ticker')
+    async def get_rates(self,ccy):
+        json = await self.get_json('chain.fair-coin.org', '/download/ticker')
         return dict([(r, Decimal(json[r]['last'])) 
                      for r in json])
-
-    def history_ccys(self):
-        return [ "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" ]
 
 class GetFaircoin(ExchangeBase):
 
-    def get_rates(self,ccy):
-        json = self.get_json('getfaircoin.net', '/api/ticker')
+    async def get_rates(self,ccy):
+        json = await self.get_json('getfaircoin.net', '/api/ticker')
         return dict([(r, Decimal(json[r]['last'])) 
                      for r in json])
-
-    def history_ccys(self):
-        return [ "EUR", "USD", "GBP", "CHF", "PLN", "MXN", "DKK", "NOK", "SEK", "SYP", "FAIRO" ]
 
 
 def dictinvert(d):
