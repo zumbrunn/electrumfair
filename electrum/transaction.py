@@ -599,7 +599,7 @@ class Transaction:
         self._inputs = None
         self._outputs = None  # type: List[TxOutput]
         self.locktime = 0
-        self.version = 2
+        self.version = 1
         # by default we assume this is a partial txn;
         # this value will get properly set when deserializing
         self.is_partial_originally = True
@@ -702,8 +702,9 @@ class Transaction:
         self._outputs = [TxOutput(x['type'], x['address'], x['value']) for x in d['outputs']]
         self.locktime = d['lockTime']
         self.version = d['version']
-        self.is_partial_originally = d['partial']
-        self._segwit_ser = d['segwit_ser']
+        #self.is_partial_originally = d['partial']
+        #self._segwit_ser = d['segwit_ser']
+        print_error("deserialized " + d)
         return d
 
     @classmethod
@@ -712,8 +713,8 @@ class Transaction:
         self._inputs = inputs
         self._outputs = outputs
         self.locktime = locktime
-        if version is not None:
-            self.version = version
+        #if version is not None:
+        self.version = 1
         self.BIP69_sort()
         return self
 
@@ -811,15 +812,15 @@ class Transaction:
 
     @classmethod
     def is_segwit_input(cls, txin, guess_for_address=False):
-        _type = txin['type']
-        if _type == 'address' and guess_for_address:
-            _type = cls.guess_txintype_from_address(txin['address'])
-        has_nonzero_witness = txin.get('witness', '00') not in ('00', None)
-        return cls.is_segwit_inputtype(_type) or has_nonzero_witness
+        #_type = txin['type']
+        #if _type == 'address' and guess_for_address:
+        #    _type = cls.guess_txintype_from_address(txin['address'])
+        #has_nonzero_witness = txin.get('witness', '00') not in ('00', None)
+        return False # cls.is_segwit_inputtype(_type) or has_nonzero_witness
 
     @classmethod
     def is_segwit_inputtype(cls, txin_type):
-        return txin_type in ('p2wpkh', 'p2wpkh-p2sh', 'p2wsh', 'p2wsh-p2sh')
+        return False #txin_type in ('p2wpkh', 'p2wpkh-p2sh', 'p2wsh', 'p2wsh-p2sh')
 
     @classmethod
     def guess_txintype_from_address(cls, addr):
@@ -838,8 +839,9 @@ class Transaction:
         addrtype, hash_160_ = b58_address_to_hash160(addr)
         if addrtype == constants.net.ADDRTYPE_P2PKH:
             return 'p2pkh'
-        elif addrtype == constants.net.ADDRTYPE_P2SH:
-            return 'p2wpkh-p2sh'
+        #elif addrtype == constants.net.ADDRTYPE_P2SH:
+        #    return 'p2wpkh-p2sh'
+        return 'p2wpkh'
 
     @classmethod
     def input_script(self, txin, estimate_size=False):
@@ -989,7 +991,7 @@ class Transaction:
             return self._segwit_ser
         return any(self.is_segwit_input(x, guess_for_address=guess_for_address) for x in self.inputs())
 
-    def serialize(self, estimate_size=False, witness=True):
+    def serialize(self, estimate_size=False, witness=False):
         network_ser = self.serialize_to_network(estimate_size, witness)
         if estimate_size:
             return network_ser
@@ -999,25 +1001,27 @@ class Transaction:
         else:
             return network_ser
 
-    def serialize_to_network(self, estimate_size=False, witness=True):
+    def serialize_to_network(self, estimate_size=False, witness=False):
         self.deserialize()
         nVersion = int_to_hex(self.version, 4)
+        print_error("version " + nVersion)
         nLocktime = int_to_hex(self.locktime, 4)
         inputs = self.inputs()
         outputs = self.outputs()
         txins = var_int(len(inputs)) + ''.join(self.serialize_input(txin, self.input_script(txin, estimate_size)) for txin in inputs)
         txouts = var_int(len(outputs)) + ''.join(self.serialize_output(o) for o in outputs)
-        use_segwit_ser_for_estimate_size = estimate_size and self.is_segwit(guess_for_address=True)
-        use_segwit_ser_for_actual_use = not estimate_size and \
-                                        (self.is_segwit() or any(txin['type'] == 'address' for txin in inputs))
-        use_segwit_ser = use_segwit_ser_for_estimate_size or use_segwit_ser_for_actual_use
-        if witness and use_segwit_ser:
-            marker = '00'
-            flag = '01'
-            witness = ''.join(self.serialize_witness(x, estimate_size) for x in inputs)
-            return nVersion + marker + flag + txins + txouts + witness + nLocktime
-        else:
-            return nVersion + txins + txouts + nLocktime
+        #use_segwit_ser_for_estimate_size = estimate_size and self.is_segwit(guess_for_address=True)
+        #use_segwit_ser_for_actual_use = not estimate_size and \
+        #                                (self.is_segwit() or any(txin['type'] == 'address' for txin in inputs))
+        #use_segwit_ser = use_segwit_ser_for_estimate_size or use_segwit_ser_for_actual_use
+        #if witness and use_segwit_ser:
+        #    marker = '00'
+        #    flag = '01'
+        #    witness = ''.join(self.serialize_witness(x, estimate_size) for x in inputs)
+        #    return nVersion + marker + flag + txins + txouts + witness + nLocktime
+        #else:
+        print_error("TX ser: " + nVersion + txins + txouts + nLocktime)
+        return nVersion + txins + txouts + nLocktime
 
     def txid(self):
         self.deserialize()
