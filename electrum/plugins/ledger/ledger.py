@@ -3,7 +3,7 @@ import hashlib
 import sys
 import traceback
 
-from electrumfair import ecc
+from electrum import ecc
 from electrum.bitcoin import TYPE_ADDRESS, int_to_hex, var_int
 from electrum.bip32 import BIP32Node
 from electrum.i18n import _

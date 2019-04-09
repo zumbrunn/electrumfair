@@ -64,17 +64,17 @@ setup(
     install_requires=requirements,
     extras_require=extras_require,
     packages=[
-        'electrumfair',
-        'electrumfair.gui',
-        'electrumfair.gui.qt',
-        'electrumfair.plugins',
-    ] + [('electrumfair.plugins.'+pkg) for pkg in find_packages('electrum/plugins')],
+        'electrum',
+        'electrum.gui',
+        'electrum.gui.qt',
+        'electrum.plugins',
+    ] + [('electrum.plugins.'+pkg) for pkg in find_packages('electrum/plugins')],
     package_dir={
-        'electrumfair': 'electrum'
+        'electrum': 'electrum'
     },
     package_data={
         '': ['*.txt', '*.json', '*.ttf', '*.otf'],
-        'electrumfair': [
+        'electrum': [
             'wordlist/*.txt',
             'locale/*/LC_MESSAGES/electrumfair.mo',
         ],

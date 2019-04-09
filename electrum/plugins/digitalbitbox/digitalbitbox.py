@@ -19,10 +19,10 @@ from electrum.crypto import sha256d, EncodeAES_base64, EncodeAES_bytes, DecodeAE
 from electrum.bitcoin import (TYPE_ADDRESS, push_script, var_int, public_key_to_p2pkh,
                               is_address)
 from electrum.bip32 import BIP32Node
-from electrumfair import ecc
+from electrum import ecc
 from electrum.ecc import msg_magic
 from electrum.wallet import Standard_Wallet
-from electrumfair import constants
+from electrum import constants
 from electrum.transaction import Transaction
 from electrum.i18n import _
 from electrum.keystore import Hardware_KeyStore

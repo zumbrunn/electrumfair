@@ -342,7 +342,7 @@ class Daemon(DaemonThread):
         gui_name = config.get('gui', 'qt')
         if gui_name in ['lite', 'classic']:
             gui_name = 'qt'
-        gui = __import__('electrumfair.gui.' + gui_name, fromlist=['electrumfair'])
+        gui = __import__('electrum.gui.' + gui_name, fromlist=['electrum'])
         self.gui = gui.ElectrumGui(config, self, plugins)
         try:
             self.gui.main()
