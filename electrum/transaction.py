@@ -704,7 +704,7 @@ class Transaction:
         self.version = d['version']
         #self.is_partial_originally = d['partial']
         #self._segwit_ser = d['segwit_ser']
-        print_error("deserialized " + d)
+        print_error("deserialized " + str(d))
         return d
 
     @classmethod
